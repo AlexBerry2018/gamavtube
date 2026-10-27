@@ -588,6 +588,74 @@ html.vert .tright{flex:1 1 auto;min-width:0;flex-wrap:wrap;justify-content:flex-
  html.land .k .m,html.land .k .d{display:none!important}html.land .k .n{flex:1;min-width:0;line-height:1.3}html.land .k .p{flex:none;line-height:1.3}}
 .alert .et{display:flex;flex-direction:column;align-items:flex-start;gap:1px;white-space:nowrap;line-height:1.25}
 .alert .et .mqw{align-self:stretch;min-width:0;overflow:hidden;font-size:.9em}
+/* ===== ПК: большой экран и мышь ===== */
+.keyhelp{display:none}
+html.desk{font-size:clamp(17px,1.15vw,26px)}
+html.desk body{font-size:.95rem}
+html.desk .crt{max-width:2200px}
+html.desk .term{grid-template-columns:minmax(300px,24%) minmax(0,1fr) minmax(280px,21%);gap:14px 16px}
+html.desk .colR .ctrls,html.desk .colR .keys{flex:none}
+html.desk .colR .keys{align-content:start;gap:8px}
+html.desk .colR .k{justify-content:flex-start;padding:8px 10px 10px}
+html.desk .avatar{font-size:clamp(.6rem,1.45vh,1rem)}
+html.desk .keyhelp{display:block;flex:1;min-height:0;overflow:auto}
+html.desk .keyhelp dl{display:grid;grid-template-columns:auto 1fr;gap:5px 12px;margin:0;font-size:.68rem}
+html.desk .keyhelp dt{font-weight:700;color:var(--ph);white-space:nowrap;border:1px solid var(--ph-dim);padding:0 5px;background:#fff;align-self:start}
+html.desk .keyhelp dd{margin:0;color:var(--ph-mid);text-align:left}
+html.desk #spawnBtn>span:first-child::after{content:"  [пробел]";font-size:.62em;opacity:.7;letter-spacing:.04em}
+html.desk .cell.has:not(.bad):not(.boss){cursor:grab}
+html.desk .cell.has:not(.bad):not(.boss):hover{outline:2px solid var(--ph);outline-offset:-3px}
+html.desk .order.ready,html.desk .btn,html.desk .tb,html.desk .bface,html.desk .avatar{cursor:pointer}
+/* ===== Ночной марафон ===== */
+.rl{position:absolute;inset:0;z-index:20;display:flex;padding:8px;background:rgba(243,239,226,.92)}
+.rlwin{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;background:var(--bg2);border:2px solid var(--ph);box-shadow:6px 6px 0 var(--ph)}
+.rlwin .whead{background:linear-gradient(90deg,#000080,#1084d0);color:#fff}
+.rlwin .whead span:last-child{cursor:pointer}
+.rlhud{flex:none;display:flex;flex-wrap:wrap;gap:4px 14px;align-items:center;padding:4px 10px;border-bottom:1px dashed var(--ph-dim);font-size:.66rem;font-weight:700;color:var(--ph)}
+.rlhp{color:var(--red);letter-spacing:.05em}
+.rlrel{display:flex;gap:4px;flex-wrap:wrap}.rlrel i{font-style:normal;border:1px solid var(--ph);padding:0 4px;background:#fff;font-size:.6rem}
+.rlcur{color:var(--red);font-size:.6rem}
+.rlbody{flex:1;min-height:0;overflow:auto;padding:10px;display:flex;flex-direction:column;gap:8px;overscroll-behavior:contain}
+.rlhome{display:flex;flex-direction:column;gap:10px;max-width:72ch;margin:0 auto;width:100%}
+.rlhome p{margin:0;font-size:.74rem;line-height:1.45;color:var(--ph-hi)}
+.rlhome h2{margin:0;font-family:var(--lcd);font-weight:400;font-size:.9rem;color:var(--ph);text-shadow:2px 2px 0 var(--red)}
+.rlhome h3{margin:4px 0 0;font-size:.68rem;color:var(--ph);text-transform:uppercase;letter-spacing:.08em}
+.rlhome .btns{display:flex;flex-wrap:wrap;gap:8px}
+.rlhome .dim{opacity:.7;font-size:.66rem}
+.rlmap{position:relative;flex:1;min-height:200px}
+.rledges{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.rledges line{stroke:var(--ph-dim);stroke-width:2;stroke-dasharray:4 4}
+.rledges line.on{stroke:var(--red);stroke-dasharray:none}
+.rlnode{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:1px;min-width:58px;padding:4px 6px;border:2px solid var(--ph-dim);background:#fff;color:var(--ph);font:700 .52rem/1.15 var(--mono);text-transform:uppercase;cursor:default}
+.rlnode b{font-size:.95rem;line-height:1}
+.rlnode.t-elite b,.rlnode.t-boss b{color:var(--red)}
+.rlnode.t-boss{border-color:var(--red);padding:6px 8px}
+.rlnode.can{border-color:var(--red);box-shadow:3px 3px 0 var(--red);cursor:pointer;animation:rlpulse 1s steps(2) infinite}
+.rlnode.here{background:var(--ph);color:#fff;border-color:var(--ph)}
+.rlnode.here b{color:#fff}
+.rlnode.past{opacity:.4}
+@keyframes rlpulse{50%{transform:translate(-50%,-50%) scale(1.06)}}
+.rlhint{margin:0;text-align:center;font-size:.64rem;opacity:.75}
+.rlwave{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(140px,30%);gap:12px}
+.rlbrd{min-height:0;min-width:0;display:flex}
+.rlbrd .board{flex:1;min-height:0;min-width:0;display:grid;place-items:center}
+.rlside{display:flex;flex-direction:column;gap:6px;min-width:0}
+.rlgoal{font-family:var(--lcd);font-size:.7rem;color:var(--ph)}
+.rlbar{height:10px;border:2px solid var(--ph);background:#fff}.rlbar i{display:block;height:100%;width:0;background:var(--red);transition:width .2s}
+.rltime{font-family:var(--lcd);font-size:1.3rem;color:var(--ph)}.rltime.low{color:var(--red);animation:blink 1s steps(2) infinite}
+.rlcombo{font-family:var(--lcd);font-size:.62rem;color:var(--red);min-height:1em}
+.rlside .dim{margin:0;font-size:.62rem;opacity:.75;line-height:1.4}
+.rlcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.rlcard{display:flex;flex-direction:column;gap:4px;align-items:flex-start;text-align:left;padding:10px;border:2px solid var(--ph);background:#fff;color:var(--ph-hi);font:inherit;cursor:pointer;box-shadow:3px 3px 0 var(--ph)}
+.rlcard:hover:not(:disabled){box-shadow:3px 3px 0 var(--red);border-color:var(--red)}
+.rlcard:disabled{opacity:.45;cursor:default}
+.rlcard b{font-family:var(--lcd);font-weight:400;font-size:.8rem;color:var(--red)}
+.rlcard strong{font-size:.76rem}
+.rlcard span{font-size:.64rem;line-height:1.35;color:var(--ph-mid)}
+.rlcard em{font-style:normal;font-weight:700;font-size:.68rem;color:var(--ph)}
+.rlopts{display:flex;flex-direction:column;gap:8px;align-items:stretch}
+@media (max-height:420px){.rlhome h2{font-size:.72rem}.rlnode{min-width:48px;padding:2px 4px}.rlnode span{display:none}.rlwave{grid-template-columns:minmax(0,1fr) minmax(120px,34%)}}
+@media (prefers-reduced-motion:reduce){.rlnode.can,.rltime.low{animation:none}}
 </style>
 <script>/* мост к Android: вибрация через нативный API */
 if(window.AndroidApp){navigator.vibrate=function(p){try{AndroidApp.vibrate(JSON.stringify(Array.isArray(p)?p:[p]))}catch(e){}return true}}</script>
@@ -633,6 +701,9 @@ ________________________________________________</pre><span class="camrec" aria-
           <button class="btn k" id="adBtn"><span class="n">3:БОНУС</span><span class="m">[ ▶ AD ]</span><span class="d">Награда за ролик</span><span class="p" id="adLabel">СМОТРЕТЬ</span></button>
         </div>
       </div>
+      <section class="panel keyhelp" id="keyHelp"><span class="ttl">КЛАВИШИ</span>
+        <dl><dt>Пробел</dt><dd>Найти</dd><dt>1 · 2 · 3</dt><dd>Автозагрузка · Разгон · Бонус</dd><dt>F1–F5</dt><dd>Дары · Комната · Ларёк · Образ · Сист</dd><dt>E</dt><dd>Событие</dd><dt>K</dt><dd>Погладить кота</dd><dt>M</dt><dd>Ночной марафон</dd><dt>Esc</dt><dd>Закрыть окно</dd><dt>ЛКМ</dt><dd>Перетащить артефакт</dd></dl>
+      </section>
     </div>
     <div class="sbar" aria-hidden="true"><span id="sbConn">Connected 0:00:00</span><span>Auto detect</span><span>56K</span><span class="off">SCROLL</span><span id="sbCaps">CAPS</span><span class="off">NUM</span></div>
     <div class="event" id="event" hidden>
@@ -1152,6 +1223,7 @@ function vib(p){if(S.vib===false||!navigator.vibrate)return;try{navigator.vibrat
 const TIPS=[
  {id:'recipe',when:()=>(S.recHints||[]).length>0&&!recs().length,el:()=>[$('chatlog')],say:'Чат шепчет рецепт! Разные артефакты тоже можно объединять.'},
  {id:'trip',when:()=>S.best>=3&&!S.trip&&!(S.stats.trips>0)&&(S.stats.playMs||0)>240000,el:()=>[$('bface')],say:'Отправь меня на барахолку! ПУСК → Кот-курьер.'},
+ {id:'marathon',when:()=>S.best>=3&&!(S.rl&&S.rl.runs)&&(S.stats.playMs||0)>360000,el:()=>[$('startBtn')],say:'Новый режим! ПУСК → Марафон: забег до утра с усилениями.'},
  {id:'quest',when:()=>S.orders.some(o=>OK(o)!=='give'&&OK(o)!=='raid'&&OK(o)!=='troll'),el:()=>[...$('orders').children].filter((c,k)=>S.orders[k]&&OK(S.orders[k])!=='give').slice(0,1),say:'Это задание чата. Выполни и жми ЗАБРАТЬ!'},
  {id:'mood',when:()=>(S.stats.playMs||0)>90000,el:()=>[$('moodBox')],say:'Сердечки — настроение. Онлайн радует, скука злит. Грустно? Погладь её!'},
  {id:'shop',when:()=>S.best>=3&&S.coins>refIncome()*250,el:()=>[$('shopBtn')],say:'Монет много! В ЛАРЬКЕ есть энергетик и флешки.'},
@@ -1163,7 +1235,7 @@ const TIPS=[
  {id:'raid',when:()=>S.orders.some(o=>o.kind==='raid'),el:()=>[...$('orders').children].slice(0,1),say:'Рейд! Быстро делай слияния, пока таймер тикает!'},
  {id:'troll',when:()=>S.orders.some(o=>o.kind==='troll'),el:()=>[$('bface')],say:'Тролль! Тыкни меня — я его забаню!'}];
 let tipT=0,tipOn=null;
-setInterval(()=>{if(S.tut<5||!streamOn||!overlay.hidden||E||document.hidden)return;const tips=S.tips||(S.tips={}),now=Date.now();
+setInterval(()=>{if(S.tut<5||!streamOn||!overlay.hidden||E||rlActive||document.hidden)return;const tips=S.tips||(S.tips={}),now=Date.now();
   if(tipOn&&now>tipOn.until){tipOn.els.forEach(e=>e&&e.classList.remove('tut'));tipOn=null}
   if(tipOn||now-tipT<20000)return;const t=TIPS.find(x=>!tips[x.id]&&x.when());if(!t)return;
   tips[t.id]=1;tipT=now;const els=(t.el()||[]).filter(Boolean);els.forEach(e=>e.classList.add('tut'));tipOn={els,until:now+7000};
@@ -1392,7 +1464,7 @@ const smiles=n=>Array.from({length:n},()=>pick(SMILES)).join(' ');
 let budTyping=0,budLast=0,budFaceT=0;
 let catFace='idle';
 function setFace(f,talk,catOnly){const k=AV_EYES[f]?f:'idle';catFace=k;$('bface').textContent=S.trip?tripArt():catArt(k,talk);if(catOnly)return;curFace=k;$('avatar').textContent=avatarArt(k,talk);if(talk)talkAmp=1}
-function spamFrom(el,n){if(REDUCED||!el||!overlay.hidden)return;const r=el.getBoundingClientRect();for(let i=0;i<n;i++){const s=document.createElement('div');s.className='float sm';s.textContent=pick(SMILES);
+function spamFrom(el,n){if(REDUCED||!el||!overlay.hidden||rlActive)return;const r=el.getBoundingClientRect();for(let i=0;i<n;i++){const s=document.createElement('div');s.className='float sm';s.textContent=pick(SMILES);
   const side=el.id==='avatar'?(i%2?1:-1):0;s.style.left=(side?(side<0?r.left-6-Math.random()*30:r.right+6+Math.random()*30):r.left+r.width/2+(Math.random()-.5)*80)+'px';s.style.top=(side?r.top+r.height*(.35+Math.random()*.4):r.top+(Math.random()-.5)*10)+'px';s.style.animationDelay=i*.12+'s';document.body.appendChild(s);setTimeout(()=>s.remove(),1500+i*120)}}
 function typeLine(text,face,catOnly){const el=$('hint'),tok=++budTyping,bf=$('bface');setFace(face,false,catOnly);bf.classList.add('talk');el.textContent='';let i=0;
   const step=()=>{if(tok!==budTyping)return;i++;el.textContent=text.slice(0,i);if(!catOnly)talkAmp=1;if(i%3===0)setFace(catFace,(i/3)%2===1,catOnly);if(i<text.length)setTimeout(step,REDUCED?0:22);else{bf.classList.remove('talk');setFace(catFace,false,catOnly);budFaceT=Date.now()+2500}};step()}
@@ -1471,7 +1543,7 @@ function bossWin(){const b=S.boss,R=refIncome(),v=Math.round(R*300);S.cells[b.ce
   setTimeout(()=>openChest('Трофей с босса'),2200);save()}
 function bossFail(){const b=S.boss;S.cells[b.cell]=BAD;shown[b.cell]=undefined;renderCell(b.cell,true);S.boss=null;moodBump(-15);viewers*=.85;
   toast('Баг сбежал и оставил битые сектора');logChat('hater_2000','ахах, проиграла баг','hot');sfx.deny();save()}
-setInterval(()=>{if(!streamOn||S.tut<5||document.hidden||E)return;const now=Date.now();
+setInterval(()=>{if(!streamOn||S.tut<5||document.hidden||E||rlActive)return;const now=Date.now();
   if(S.boss){if(S.cells[S.boss.cell]!==BOSS){S.boss=null;return}
     if(now>S.boss.until){bossFail();return}
     if(now-bossT>15000&&overlay.hidden){bossT=now;const near=nbrs(S.boss.cell,BC,N).filter(j=>S.cells[j]===null),e=near.length?near:emptyCells();
@@ -1526,7 +1598,7 @@ function banTroll(k){const o=S.orders[k];if(!o||o.kind!=='troll')return;S.orders
 function trollHit(o){const e=emptyCells();let what='';
   if(e.length&&Math.random()<.6){const i=pick(e);S.cells[i]=BAD;renderCell(i,true);what='сломал клетку'}else{const st=Math.min(S.coins*.05,refIncome()*60);S.coins-=st;what=`украл ◈${fmt(st)}`}
   moodBump(-10);toast(`${o.user} ${what}. Бань быстрее!`);logChat(o.user,'ахаха, лох','hot');sfx.deny();shake()}
-setInterval(()=>{if(!streamOn||S.tut<5||E||document.hidden)return;const now=Date.now();
+setInterval(()=>{if(!streamOn||S.tut<5||E||rlActive||document.hidden)return;const now=Date.now();
   let ch=false;for(let k=S.orders.length-1;k>=0;k--){const o=S.orders[k];
     if(o.kind==='troll'&&o.until<=now){S.orders.splice(k,1);trollHit(o);ch=true}
     else if(o.kind==='raid'&&o.until<=now&&o.n<o.need){S.orders.splice(k,1);logChat(o.user,pick(['скучно, уходим','ну и ладно','пока!']),'hot');viewers*=.85;moodBump(-6);toast('Рейд ушёл, не дождавшись');ch=true}}
@@ -1686,7 +1758,7 @@ addEventListener('resize',fitAll);addEventListener('orientationchange',()=>setTi
 document.addEventListener('visibilitychange',()=>{if(document.hidden)save();else lastT=performance.now()});
 
 let layoutMode='';
-function applyLayout(){const land=innerWidth>=innerHeight,vert=!land&&!!S.vertOK,root=document.documentElement;
+function applyLayout(){const land=innerWidth>=innerHeight,vert=!land&&!!S.vertOK,root=document.documentElement;root.classList.toggle('desk',land&&innerWidth>=1200&&innerHeight>=680);
   $('rotate').hidden=land||vert;const mode=land?'land':'vert';root.classList.toggle('land',land||!vert&&!land);root.classList.toggle('vert',vert);
   const nb=vert?5:6;if(nb!==BC){BC=nb;renderBoard()}if(mode!==layoutMode){layoutMode=mode;requestAnimationFrame(fitAll)}}
 $('vertOk').onclick=()=>{S.vertOK=true;save();applyLayout();fitAll()};
@@ -1707,6 +1779,7 @@ const DESK_ICONS=[
   {id:'gifts',label:'Подарки',art:"  _\\/_\n |_||_|\n |_||_|"},
   {id:'event',label:'Событие',art:"  ____\n |0000|\n |_!!_|"},
   {id:'trip',label:'Кот-курьер',art:" /\\_/\\ _\n( o.o)[_]\n /   \\ "},
+  {id:'marathon',label:'Марафон',art:" .-----.\n |>_?$☠|\n '--BUG'"},
   {id:'shop',label:'Ларёк',art:"  ____\n /____\\\n |_◈__|"},
   {id:'sched',label:'Расписание',art:"  ______\n |20:00 |\n |_★____|"},
   {id:'ward',label:'Гардероб',art:"  _o_\n /| |\\\n  / \\"},
@@ -1756,7 +1829,7 @@ function renderDesk(){$('wall').textContent=asciiFrom(Math.max(0,S.best));
   const msg=!c.set?['Расписание не задано','Выбери время эфира: зрители любят стримы в одно время.']:now?['Эфир по расписанию!','Зрители уже ждут: онлайн ×'+schedMult().toFixed(1)+' на 10 минут.']:null;
   if(msg&&!streamOn){const b=document.createElement('div');b.className='balloon';b.innerHTML=`<b>${msg[0]}</b>${msg[1]}`;b.onclick=()=>{b.remove();deskAction('sched')};tb.appendChild(b);setTimeout(()=>b.remove(),9000)}}
 function deskAction(a){if(a==='off'){shutdown();return}launchStream();
-  const after={room:showRoom,gifts:showDaily,event:evIntro,settings:showMenu,ward:showWardrobe,sched:showSched,shop:showShop,trip:showTrip}[a];if(after)setTimeout(after,streamOn?380:1400)}
+  const after={room:showRoom,gifts:showDaily,event:evIntro,settings:showMenu,ward:showWardrobe,sched:showSched,shop:showShop,trip:showTrip,marathon:rlOpen}[a];if(after)setTimeout(after,streamOn?380:1400)}
 function launchStream(){const pc=$('pc');pc.classList.add('out');sfx.key('5');setTimeout(()=>{pc.hidden=true;pc.classList.remove('out');fitAll()},REDUCED?0:340);
   if(!streamOn){streamOn=true;startUp();setTimeout(schedCheck,REDUCED?400:1800)}}
 function showDesk(){const pc=$('pc');renderDesk();pc.hidden=false;pc.classList.add('desk-on');$('desk').hidden=false;$('splash').hidden=true;$('bootTxt').hidden=true}
@@ -1781,6 +1854,195 @@ function pcBoot(waitTap){const pc=$('pc'),pre=$('bootTxt');bootStage=0;bootTimer
 $('pc').addEventListener('pointerdown',e=>{if(bootStage===-1){pcBoot();return}if(bootStage<3)toDesk()});
 pcBoot();
 
+/* ================= НОЧНОЙ МАРАФОН — режим-рогалик ================= */
+const RL_RELICS=[
+ {id:'double',name:'Двойной клик',art:'x2',desc:'20% шанс, что слияние даст +2 уровня вместо +1',lock:0},
+ {id:'magnet',name:'Магнит',art:'[U]',desc:'Новые артефакты падают рядом с такими же',lock:0},
+ {id:'coffee',name:'Кофе 3-в-1',art:'(_)',desc:'+12 секунд к каждому эфиру',lock:0},
+ {id:'pocket',name:'Флешка в кармане',art:'|::|',desc:'Каждый эфир начинается с флешки-джокера',lock:0},
+ {id:'combo',name:'Комбо-мастер',art:'>>>',desc:'Окно комбо дольше, множитель растёт быстрее',lock:0},
+ {id:'donor',name:'Донатер',art:'$$',desc:'+1 монета за каждое слияние',lock:0},
+ {id:'antivir',name:'Антивирус',art:'[AV]',desc:'Битые секторы не появляются, по боссу урон +2',lock:0},
+ {id:'nostalgia',name:'Ностальгия',art:'<3',desc:'Каждый 4-й новый артефакт сразу уровня 2',lock:0},
+ {id:'cold',name:'Холодный старт',art:'*',desc:'Первые 6 секунд эфира ничего не падает',lock:0},
+ {id:'greed',name:'Жадность',art:'$!',desc:'Монеты ×1,6, но максимум сигнала −1',lock:10},
+ {id:'wide',name:'Широкий канал',art:'<->',desc:'Поле на одну колонку шире',lock:15},
+ {id:'reso',name:'Резонанс',art:'~~',desc:'Слияние того же уровня, что и прошлое: очки ×1,5',lock:12},
+ {id:'second',name:'Второй шанс',art:'+1',desc:'Один раз за забег спасает от потери последнего сигнала',lock:20},
+ {id:'medkit',name:'Аптечка',art:'[+]',desc:'После проклятого эфира и босса +1 сигнал',lock:15}];
+const RL_CURSES={lag:{name:'Лаги',desc:'артефакты падают на 20% чаще'},haters:{name:'Хейтеры',desc:'в эфире каждые 12 с появляется битый сектор'},
+ wifi:{name:'Слабый Wi-Fi',desc:'−8 секунд на каждый эфир'},ads:{name:'Реклама',desc:'−15% очков'}};
+const RL_NODE={fight:{n:'Эфир',a:'>_'},elite:{n:'Проклятый эфир',a:'☠'},event:{n:'Событие',a:'?'},shop:{n:'Ларёк',a:'$'},rest:{n:'Отдых',a:'♥'},boss:{n:'Миллениум-баг',a:'BUG'}};
+const RL_PERKS=[{id:'hp',name:'Запасной роутер',desc:'+1 к максимуму сигнала',cost:20,max:2},{id:'coins',name:'Заначка',desc:'Старт с +25 монетами',cost:15,max:2},
+ {id:'relic',name:'Счастливый талисман',desc:'Старт со случайным усилением',cost:30,max:1},{id:'reroll',name:'Переиграть',desc:'1 замена вариантов при каждом выборе',cost:25,max:1}];
+var rlActive=false;
+const rlMeta=()=>S.rl||(S.rl={tapes:0,unlocked:[],perks:{},best:0,runs:0,wins:0});
+const rlHas=id=>!!(S.run&&S.run.relics.includes(id));
+const rlCurse=id=>!!(S.run&&S.run.curses.includes(id));
+const rlPool=()=>RL_RELICS.filter(r=>!r.lock||rlMeta().unlocked.includes(r.id));
+function rlRand(n){return Math.floor(Math.random()*n)}
+function rlGenMap(){const cols=[];for(let c=0;c<8;c++){const n=c===7?1:c===0?3:2+rlRand(2),col=[];
+    for(let j=0;j<n;j++){let t='fight';if(c===7)t='boss';else if(c===6)t=j%2?'shop':'rest';else if(c>0){const r=Math.random();t=r<.46?'fight':r<.66?'event':r<.76?'shop':r<.92?'elite':'rest'}col.push({t,y:(j+.5)/n,to:[]})}cols.push(col)}
+  for(let c=0;c<7;c++)cols[c].forEach((nd,j)=>{const nx=cols[c+1];const near=nx.map((m,k)=>({k,d:Math.abs(m.y-nd.y)})).sort((a,b)=>a.d-b.d);nd.to=near.slice(0,nx.length>1&&Math.random()<.6?2:1).map(x=>x.k)});
+  for(let c=1;c<8;c++)cols[c].forEach((nd,k)=>{if(!cols[c-1].some(p=>p.to.includes(k))){const p=cols[c-1].map((m,j)=>({j,d:Math.abs(m.y-nd.y)})).sort((a,b)=>a.d-b.d)[0];cols[c-1][p.j].to.push(k)}});
+  return cols}
+function rlNewRun(){const m=rlMeta(),hp=3+(m.perks.hp||0);S.run={map:rlGenMap(),col:-1,row:-1,hp,max:hp,coins:(m.perks.coins||0)*25,relics:[],curses:[],second:true,merges:0,cleared:0,started:Date.now()};
+  if(m.perks.relic){const p=rlPool();S.run.relics.push(pick(p).id)}m.runs++;save()}
+/* ---------- окно режима ---------- */
+function rlOpen(){if(!$('rl')){const d=document.createElement('div');d.id='rl';d.className='rl';d.hidden=true;document.querySelector('.crt').appendChild(d)}
+  rlActive=true;$('rl').hidden=false;if(!S.run)rlHome();else rlMapView();sfx.key('#')}
+function rlClose(){rlStopWave();rlActive=false;$('rl').hidden=true;save()}
+function rlFrame(body,sub){const r=S.run,m=rlMeta();
+  const hud=r?`<span class="rlhp" title="Сигнал">СИГНАЛ ${'▮'.repeat(r.hp)}${'▯'.repeat(Math.max(0,r.max-r.hp))}</span><span>◈ ${r.coins}</span><span>ЭТАЖ ${Math.max(0,r.col+1)}/8</span>${r.relics.length?`<span class="rlrel">${r.relics.map(id=>{const x=RL_RELICS.find(q=>q.id===id);return`<i title="${x.name}: ${x.desc}">${x.art}</i>`}).join('')}</span>`:''}${r.curses.map(c=>`<b class="rlcur" title="${RL_CURSES[c].desc}">☠ ${RL_CURSES[c].name}</b>`).join('')}`:`<span>ПЛЁНКИ ${m.tapes}</span><span>РЕКОРД: этаж ${m.best}</span>`;
+  $('rl').innerHTML=`<div class="rlwin"><div class="whead"><span>marathon.exe${sub?' · '+sub:''}</span><span id="rlX">[X]</span></div><div class="rlhud">${hud}</div><div class="rlbody">${body}</div></div>`;
+  $('rlX').onclick=rlClose}
+function rlHome(){const m=rlMeta();
+  rlFrame(`<div class="rlhome"><pre class="ascii">   .--------------------------.\n   |  НОЧНОЙ  МАРАФОН  02:47  |\n   |  >_  ?  $  ☠  ♥  >> BUG  |\n   '--------------------------'</pre>
+  <p>Стрим до утра. Пройди 7 этажей и победи Миллениум-баг. Эфиры — это короткие волны на отдельном поле: набери очки слияниями, пока не кончилось время и пока поле не переполнилось. Провал стоит одно деление сигнала. Сигнал кончился — забег окончен.</p>
+  <p>После побед выбираешь 1 из 3 усилений. За каждый забег дают плёнки: на них в Архиве открываются новые усиления и стартовые бонусы. Основная игра тоже получает монеты и подписчиков.</p>
+  <div class="btns"><button class="btn big pink" id="rlGo">НАЧАТЬ ЗАБЕГ</button><button class="btn" id="rlArch">АРХИВ · ${m.tapes} плёнок</button></div>
+  <p class="dim">Забегов: ${m.runs} · Побед над багом: ${m.wins} · Лучший этаж: ${m.best}</p></div>`,'меню');
+  $('rlGo').onclick=()=>{rlNewRun();rlMapView()};$('rlArch').onclick=rlArchive}
+/* ---------- карта ---------- */
+function rlAvail(){const r=S.run;if(r.col<0)return r.map[0].map((_,k)=>k);return r.map[r.col][r.row].to}
+function rlMapView(){const r=S.run,av=rlAvail(),W=8;
+  let lines='';r.map.forEach((col,c)=>col.forEach((nd,j)=>nd.to.forEach(k=>{const x1=(c+.5)/W*100,y1=nd.y*100,x2=(c+1.5)/W*100,y2=r.map[c+1][k].y*100,on=c===r.col&&j===r.row;
+    lines+=`<line x1="${x1}%" y1="${y1}%" x2="${x2}%" y2="${y2}%" class="${on?'on':''}"/>`})));
+  const nodes=r.map.map((col,c)=>col.map((nd,j)=>{const can=c===r.col+1&&av.includes(j),here=c===r.col&&j===r.row,past=c<=r.col;
+    return`<button class="rlnode t-${nd.t}${can?' can':''}${here?' here':''}${past&&!here?' past':''}" style="left:${(c+.5)/W*100}%;top:${nd.y*100}%" data-c="${c}" data-j="${j}" ${can?'':'disabled'} title="${RL_NODE[nd.t].n}"><b>${RL_NODE[nd.t].a}</b><span>${RL_NODE[nd.t].n}</span></button>`}).join('')).join('');
+  rlFrame(`<div class="rlmap"><svg class="rledges" preserveAspectRatio="none">${lines}</svg>${nodes}</div><p class="rlhint">Выбери следующую точку маршрута. ☠ — сложнее, но награда лучше.</p>`,'карта');
+  $('rl').querySelectorAll('.rlnode.can').forEach(b=>b.onclick=()=>{r.col=+b.dataset.c;r.row=+b.dataset.j;save();rlEnter(r.map[r.col][r.row].t)})}
+function rlEnter(t){if(t==='fight'||t==='elite'||t==='boss')rlWave(t);else if(t==='event')rlEvent();else if(t==='shop')rlShop();else rlRest()}
+function rlNext(){const r=S.run;r.cleared=Math.max(r.cleared,r.col+1);rlMeta().best=Math.max(rlMeta().best,r.cleared);save();rlMapView()}
+function rlDamage(n,why){const r=S.run;r.hp-=n;if(r.hp<=0&&rlHas('second')&&r.second){r.second=false;r.hp=1;toast('Второй шанс спас забег!');sfx.fanfare()}
+  shake();sfx.deny();if(why)toast(why);if(r.hp<=0){rlEnd(false);return true}save();return false}
+/* ---------- эфир-волна ---------- */
+let RW=null,rwT=0;
+function rlStopWave(){if(rwT){clearInterval(rwT);rwT=0}RW=null}
+function rlWave(t){const r=S.run,fl=r.col+1,cols=rlHas('wide')?6:5,rows=4,boss=t==='boss',elite=t==='elite';
+  let time=boss?60:40;if(rlHas('coffee'))time+=12;if(rlCurse('wifi'))time-=8;
+  const target=Math.round(260*Math.pow(1.42,fl)*(elite?1.6:1));
+  RW={t,cols,rows,cells:Array(cols*rows).fill(null),score:0,target,end:Date.now()+time*1000,time,spawnAt:Date.now()+(rlHas('cold')?6000:900),
+    spInt:Math.max(.7,1.55-fl*.08)*(rlCurse('lag')?.8:1)*(elite?.85:1),combo:0,lastM:0,lastTier:-1,nSpawn:0,hateT:Date.now()+12000,boss:null,bossT:Date.now()+8000,done:false};
+  for(let i=0;i<4;i++)rwPlace(0);if(rlHas('pocket'))rwPlace(J);
+  if(boss){const mid=Math.floor(rows/2)*cols+Math.floor(cols/2);RW.cells[mid]=BOSS;RW.boss={i:mid,hp:18+fl*3,max:18+fl*3}}
+  rlFrame(`<div class="rlwave"><div class="rlbrd"><div class="board"><div class="grid" id="rlGrid"></div></div></div>
+    <div class="rlside"><div class="rlgoal" id="rwGoal"></div><div class="rlbar"><i id="rwBar"></i></div><div class="rltime" id="rwTime"></div><div class="rlcombo" id="rwCombo"></div>
+    <p class="dim">${boss?'Бей баг слияниями в соседних клетках. Каждые 8 с он ломает клетку.':'Объединяй одинаковые артефакты. Комбо — слияния подряд без пауз.'} Поле переполнилось — эфир провален.</p></div></div>`,RL_NODE[t].n);
+  const g=$('rlGrid');g.innerHTML=RW.cells.map((_,i)=>`<div class="cell" data-i="${i}"></div>`).join('');RW.cells.forEach((_,i)=>rwRender(i));
+  requestAnimationFrame(()=>fitGrid(g,cols,rows));
+  attachDrag(g,{get:i=>RW?RW.cells[i]:null,fixed:i=>!RW||RW.cells[i]===BAD||RW.cells[i]===BOSS,
+    targetAt(x,y){const el=document.elementFromPoint(x,y);const c=el&&el.closest('.cell');return c&&g.contains(c)?{type:'cell',i:+c.dataset.i,el:c}:null},
+    onTap(){},onDrop(from,tg){rwDrop(from,tg.i)}});
+  rwT=setInterval(rwTick,100);rwHud();
+  if(boss){cutin('БОСС!!','Миллениум-баг','shock')}else if(elite)cutin('ПРОКЛЯТЫЙ ЭФИР','очков нужно больше','shock')}
+function rwRender(i){const g=$('rlGrid');if(!g||!RW)return;const el=g.children[i],t=RW.cells[i];if(!el)return;
+  el.innerHTML=t===null?'':`<div class="gem">${gemSVG(t)}</div><span class="lvl">${t===BOSS?'♥'+RW.boss.hp:lvlOf(t)}</span>`;
+  el.classList.toggle('has',t!==null&&t!==BAD);el.classList.toggle('bad',t===BAD);el.classList.toggle('boss',t===BOSS)}
+function rwPlace(t){const e=[];RW.cells.forEach((x,i)=>{if(x===null)e.push(i)});if(!e.length)return false;let i=pick(e);
+  if(rlHas('magnet')&&isItem(t)){const near=[];RW.cells.forEach((x,k)=>{if(x===t)nbrs(k,RW.cols,RW.cells.length).forEach(j=>{if(RW.cells[j]===null)near.push(j)})});if(near.length)i=pick(near)}
+  RW.cells[i]=t;rwRender(i);return true}
+function rwDrop(a,b){if(!RW||RW.done)return;const A=RW.cells[a],B=RW.cells[b];if(B===BAD||B===BOSS){sfx.deny();return}
+  let res=null;if(A===J&&isItem(B))res=B+1;else if(B===J&&isItem(A))res=A+1;else if(isItem(A)&&A===B)res=A+1;
+  if(res===null){RW.cells[a]=B;RW.cells[b]=A;rwRender(a);rwRender(b);return}
+  if(rlHas('double')&&Math.random()<.2)res++;res=Math.min(res,MAX);
+  RW.cells[b]=res;RW.cells[a]=null;rwRender(a);rwRender(b);const el=$('rlGrid').children[b];
+  const now=Date.now(),win=rlHas('combo')?3000:2000;RW.combo=now-RW.lastM<win?RW.combo+1:1;RW.lastM=now;
+  let pts=10*Math.pow(2,res)*Math.min(4,1+(RW.combo-1)*(rlHas('combo')?.4:.25));if(rlHas('reso')&&res-1===RW.lastTier)pts*=1.5;if(rlCurse('ads'))pts*=.85;RW.lastTier=res-1;
+  pts=Math.round(pts);RW.score+=pts;S.run.merges++;if(rlHas('donor'))S.run.coins+=1;
+  nbrs(b,RW.cols,RW.cells.length).forEach(j=>{if(RW.cells[j]===BAD){RW.cells[j]=null;rwRender(j)}});
+  if(RW.boss&&nbrs(b,RW.cols,RW.cells.length).includes(RW.boss.i)){const d=(res+1)*2+(rlHas('antivir')?2:0);RW.boss.hp=Math.max(0,RW.boss.hp-d);rwRender(RW.boss.i);floatText($('rlGrid').children[RW.boss.i],'-'+d);shake()}
+  burstAt(el,8+res*2);sfx.merge(res);floatText(el,'+'+pts);rwHud();rwCheck()}
+function rwHud(){if(!RW)return;const left=Math.max(0,RW.end-Date.now()),boss=!!RW.boss;
+  const p=boss?1-RW.boss.hp/RW.boss.max:Math.min(1,RW.score/RW.target);
+  const g=$('rwGoal');if(!g)return;g.textContent=boss?`БАГ ♥ ${RW.boss.hp}/${RW.boss.max}`:`${fmtInt(RW.score)} / ${fmtInt(RW.target)}`;
+  $('rwBar').style.width=(p*100)+'%';$('rwTime').textContent=mmss(left);$('rwTime').classList.toggle('low',left<10000);
+  $('rwCombo').textContent=RW.combo>1&&Date.now()-RW.lastM<(rlHas('combo')?3000:2000)?`КОМБО ×${RW.combo}`:''}
+function rwTick(){if(!RW||RW.done)return;const now=Date.now();
+  if(now>=RW.spawnAt){RW.nSpawn++;const t=rlHas('nostalgia')&&RW.nSpawn%4===0?1:0;if(!rwPlace(t)){rwFail('Поле переполнилось!');return}RW.spawnAt=now+RW.spInt*1000}
+  if(rlCurse('haters')&&!rlHas('antivir')&&now>RW.hateT){RW.hateT=now+12000;const e=RW.cells.map((x,i)=>x===null?i:-1).filter(i=>i>=0);if(e.length){const i=pick(e);RW.cells[i]=BAD;rwRender(i)}}
+  if(RW.boss&&now>RW.bossT){RW.bossT=now+8000;if(!rlHas('antivir')||Math.random()<.4){const e=nbrs(RW.boss.i,RW.cols,RW.cells.length).filter(i=>RW.cells[i]===null);const all=RW.cells.map((x,i)=>x===null?i:-1).filter(i=>i>=0);const pool=e.length?e:all;if(pool.length){const i=pick(pool);RW.cells[i]=BAD;rwRender(i);sfx.deny()}}}
+  if(now>=RW.end){rwFail('Время вышло');return}rwHud()}
+function rwCheck(){if(!RW||RW.done)return;if(RW.boss?RW.boss.hp<=0:RW.score>=RW.target)rwWin()}
+function rwWin(){const t=RW.t,r=S.run;RW.done=true;rlStopWave();const fl=r.col+1;let c=12+fl*3+(t==='elite'?20:0);if(rlHas('greed'))c=Math.round(c*1.6);r.coins+=c;
+  sfx.fanfare();cutin(t==='boss'?'БАГ ПОВЕРЖЕН!!':'ЭФИР ПРОЙДЕН!',`+${c} монет`,'neko');
+  if((t==='elite'||t==='boss')&&rlHas('medkit'))r.hp=Math.min(r.max,r.hp+1);
+  if(t==='boss'){rlEnd(true);return}save();rlPickRelic(t==='elite'?'Редкая награда за проклятый эфир':'Награда за эфир',()=>rlNext())}
+function rwFail(why){const t=RW.t;RW.done=true;rlStopWave();const dmg=t==='elite'||t==='boss'?2:1;
+  if(rlDamage(dmg,`${why} −${dmg} сигнал`))return;rlFrame(`<div class="rlhome"><h2>Эфир провален</h2><p>${why}. Сигнал −${dmg}. Забег продолжается.</p><div class="btns"><button class="btn pink" id="rlOk">К карте</button></div></div>`,'провал');
+  $('rlOk').onclick=()=>{if(t==='boss')rlEnd(false);else rlNext()}}
+/* ---------- выбор усиления ---------- */
+function rlPickRelic(title,then){const r=S.run;let rr=rlMeta().perks.reroll?1:0;
+  const draw=()=>{const pool=rlPool().filter(x=>!r.relics.includes(x.id));const opts=[];while(opts.length<3&&pool.length)opts.push(pool.splice(rlRand(pool.length),1)[0]);return opts};
+  let opts=draw();
+  const show=()=>{rlFrame(`<div class="rlhome"><h2>${title}</h2><p>Выбери одно усиление на весь забег.</p><div class="rlcards">${opts.map(o=>`<button class="rlcard" data-id="${o.id}"><b>${o.art}</b><strong>${o.name}</strong><span>${o.desc}</span></button>`).join('')||'<p>Все усиления уже собраны!</p>'}</div>
+    <div class="btns">${rr?'<button class="btn" id="rlRe">Переиграть варианты</button>':''}<button class="btn" id="rlSkip">Пропустить (+10 монет)</button></div></div>`,'награда');
+    $('rl').querySelectorAll('.rlcard').forEach(b=>b.onclick=()=>{const id=b.dataset.id;r.relics.push(id);if(id==='greed'){r.max=Math.max(1,r.max-1);r.hp=Math.min(r.hp,r.max)}sfx.chest();save();then()});
+    $('rlSkip').onclick=()=>{r.coins+=10;save();then()};if(rr)$('rlRe').onclick=()=>{rr=0;opts=draw();show()}};show()}
+/* ---------- события ---------- */
+const RL_EVENTS=[
+ {t:'Подозрительная флешка',d:'Под столом нашлась флешка без подписи. Вставить в компьютер прямо в эфире?',o:[
+   {l:'Вставить',f:()=>Math.random()<.5?rlGiveRelic('На флешке нашлось усиление!'):(rlDamage(1,'Вирус! −1 сигнал')||rlInfo('Флешка оказалась с вирусом. Сигнал −1.'))},
+   {l:'Выкинуть',f:()=>rlInfo('Флешка отправилась в мусорку. Ничего не случилось.')}]},
+ {t:'Спонсор',d:'Магазин модемов предлагает рекламный контракт до конца марафона.',o:[
+   {l:'Подписать (+60 монет, проклятие «Реклама»)',f:()=>{S.run.coins+=60;rlAddCurse('ads');rlInfo('Контракт подписан: +60 монет. Очки в эфирах −15%.')}},
+   {l:'Отказаться',f:()=>rlInfo('Чат уважает: без рекламы честнее.')}]},
+ {t:'Ночной зритель',d:'В 4 утра в чате остался один зритель. Он пишет: «не спится?»',o:[
+   {l:'Поболтать (+1 сигнал)',f:()=>{S.run.hp=Math.min(S.run.max,S.run.hp+1);rlInfo('Душевный разговор. Сигнал +1.')}},
+   {l:'Попросить донат (+25 монет)',f:()=>{S.run.coins+=25;rlInfo('Зритель скинул 25 монет и ушёл спать.')}}]},
+ {t:'Сломанный роутер',d:'Роутер мигает красным. Можно починить или пнуть.',o:[
+   {l:'Починить (−20 монет, +1 к максимуму сигнала)',ok:()=>S.run.coins>=20,f:()=>{S.run.coins-=20;S.run.max++;S.run.hp++;rlInfo('Роутер как новый. Максимум сигнала +1.')}},
+   {l:'Пнуть',f:()=>Math.random()<.5?rlGiveRelic('Роутер заработал и показал скрытое усиление!'):(rlAddCurse('wifi'),rlInfo('Стало только хуже: проклятие «Слабый Wi-Fi».'))}]},
+ {t:'Хейтер-рейд',d:'В чат ворвалась толпа хейтеров.',o:[
+   {l:'Забанить всех (−1 сигнал, +усиление)',f:()=>{if(rlDamage(1,'Тяжёлая модерация: −1 сигнал'))return;rlGiveRelic('Модераторы благодарят: усиление')}},
+   {l:'Игнорировать (проклятие «Хейтеры»)',f:()=>{rlAddCurse('haters');rlInfo('Хейтеры остались в чате и будут ломать клетки.')}}]},
+ {t:'Лаги на сервере',d:'Стрим подлагивает. Можно перезапустить OBS.',o:[
+   {l:'Перезапустить (−15 монет)',ok:()=>S.run.coins>=15,f:()=>{S.run.coins-=15;rlInfo('Картинка снова плавная.')}},
+   {l:'Стримить как есть (+40 монет, проклятие «Лаги»)',f:()=>{S.run.coins+=40;rlAddCurse('lag');rlInfo('Чат жалуется, но донатит: +40 монет.')}}]}];
+function rlAddCurse(id){if(!S.run.curses.includes(id))S.run.curses.push(id);save()}
+function rlInfo(text){rlFrame(`<div class="rlhome"><p>${text}</p><div class="btns"><button class="btn pink" id="rlOk">Дальше</button></div></div>`,'событие');$('rlOk').onclick=rlNext;save()}
+function rlGiveRelic(text){const pool=rlPool().filter(x=>!S.run.relics.includes(x.id));if(!pool.length){S.run.coins+=30;rlInfo(text+' Но всё уже собрано: +30 монет.');return}
+  const x=pick(pool);S.run.relics.push(x.id);if(x.id==='greed'){S.run.max=Math.max(1,S.run.max-1);S.run.hp=Math.min(S.run.hp,S.run.max)}sfx.chest();rlInfo(`${text} «${x.name}»: ${x.desc}.`)}
+function rlEvent(){const e=pick(RL_EVENTS);rlFrame(`<div class="rlhome"><h2>${e.t}</h2><p>${e.d}</p><div class="rlopts">${e.o.map((o,i)=>`<button class="btn" data-o="${i}" ${o.ok&&!o.ok()?'disabled':''}>${o.l}</button>`).join('')}</div></div>`,'событие');
+  $('rl').querySelectorAll('[data-o]').forEach(b=>b.onclick=()=>e.o[+b.dataset.o].f())}
+/* ---------- ларёк и отдых ---------- */
+function rlShop(){const r=S.run;const pool=rlPool().filter(x=>!r.relics.includes(x.id));const items=[];while(items.length<3&&pool.length){const x=pool.splice(rlRand(pool.length),1)[0];items.push({x,p:40+rlRand(4)*10})}
+  const render=()=>{rlFrame(`<div class="rlhome"><h2>Ночной ларёк</h2><p>Монеты забега: <b>◈ ${r.coins}</b></p><div class="rlcards">${items.map((it,i)=>`<button class="rlcard" data-b="${i}" ${it.sold||r.coins<it.p?'disabled':''}><b>${it.x.art}</b><strong>${it.x.name}</strong><span>${it.x.desc}</span><em>${it.sold?'КУПЛЕНО':'◈ '+it.p}</em></button>`).join('')}</div>
+    <div class="rlopts"><button class="btn" id="rlHeal" ${r.coins<25||r.hp>=r.max?'disabled':''}>Энергетик: +1 сигнал · ◈ 25</button><button class="btn" id="rlUncurse" ${r.coins<50||!r.curses.length?'disabled':''}>Снять проклятие · ◈ 50</button><button class="btn pink" id="rlOk">Уйти</button></div></div>`,'ларёк');
+    $('rl').querySelectorAll('[data-b]').forEach(b=>b.onclick=()=>{const it=items[+b.dataset.b];if(it.sold||r.coins<it.p)return;r.coins-=it.p;it.sold=1;r.relics.push(it.x.id);if(it.x.id==='greed'){r.max=Math.max(1,r.max-1);r.hp=Math.min(r.hp,r.max)}sfx.coin();save();render()});
+    $('rlHeal').onclick=()=>{r.coins-=25;r.hp=Math.min(r.max,r.hp+1);sfx.coin();save();render()};$('rlUncurse').onclick=()=>{r.coins-=50;r.curses.shift();sfx.coin();save();render()};$('rlOk').onclick=rlNext};render()}
+function rlRest(){const r=S.run;rlFrame(`<div class="rlhome"><pre class="ascii">  (  )   ( )\n   )(  zZ  )(\n  [____]  [__]</pre><h2>Перерыв на чай</h2><p>Стримерша ушла на кухню. Чат ждёт.</p>
+  <div class="rlopts"><button class="btn" id="rlA" ${r.hp>=r.max?'disabled':''}>Отдохнуть: +2 сигнала</button><button class="btn" id="rlB">Апгрейд роутера: +1 к максимуму</button></div></div>`,'отдых');
+  $('rlA').onclick=()=>{r.hp=Math.min(r.max,r.hp+2);sfx.chest();rlNext()};$('rlB').onclick=()=>{r.max++;sfx.chest();rlNext()}}
+/* ---------- конец забега и архив ---------- */
+function rlEnd(win){const r=S.run,m=rlMeta(),fl=win?8:r.cleared;const tapes=fl*2+(win?15:0)+Math.floor(r.merges/25);m.tapes+=tapes;m.best=Math.max(m.best,fl);if(win)m.wins++;
+  const coins=Math.round(refIncome()*(40*fl+(win?300:0))),subs=fl*6+(win?80:0);addCoins(coins);addSubs(subs);moodBump(win?20:5);S.run=null;save();
+  if(win)for(let i=0;i<8;i++)setTimeout(()=>chatSpawn(pick(['ЛЕГЕНДА МАРАФОНА','баг повержен!!','до утра!!','GG','8888888']),true),200+i*220);
+  rlFrame(`<div class="rlhome"><pre class="ascii">${win?'   \\o/   ПОБЕДА!\n    |\n   / \\':'   x_x   СИГНАЛ ПОТЕРЯН\n   /|\\\n   / \\'}</pre><h2>${win?'Марафон пройден!':'Забег окончен'}</h2>
+  <p>Этажей пройдено: <b>${fl}</b> · слияний: <b>${r.merges}</b> · усилений: <b>${r.relics.length}</b></p><p>Плёнки для Архива: <b>+${tapes}</b> (всего ${m.tapes}).<br>В основную игру: <b>◈ ${fmt(coins)}</b> и <b>+${subs}</b> подписчиков.</p>
+  <div class="btns"><button class="btn big pink" id="rlAgain">Новый забег</button><button class="btn" id="rlArch">Архив</button><button class="btn" id="rlBack">В основную игру</button></div></div>`,'итоги');
+  $('rlAgain').onclick=()=>{rlNewRun();rlMapView()};$('rlArch').onclick=rlArchive;$('rlBack').onclick=rlClose;sfx[win?'fanfare':'deny']()}
+function rlArchive(){const m=rlMeta();const relics=RL_RELICS.filter(r=>r.lock).map(r=>{const own=m.unlocked.includes(r.id);return`<div class="sitem"><pre>${r.art}</pre><div><b>${r.name}</b><span>${r.desc}</span></div>${own?'<button class="btn wbtn" disabled>ОТКРЫТО</button>':`<button class="btn wbtn" data-u="${r.id}" ${m.tapes<r.lock?'disabled':''}>${r.lock} плёнок</button>`}</div>`}).join('');
+  const perks=RL_PERKS.map(p=>{const lv=m.perks[p.id]||0;return`<div class="sitem"><pre>${lv}/${p.max}</pre><div><b>${p.name}</b><span>${p.desc}</span></div>${lv>=p.max?'<button class="btn wbtn" disabled>МАКС</button>':`<button class="btn wbtn" data-p="${p.id}" ${m.tapes<p.cost?'disabled':''}>${p.cost} плёнок</button>`}</div>`}).join('');
+  rlFrame(`<div class="rlhome"><h2>Архив кассет</h2><p>Плёнки: <b>${m.tapes}</b>. Открытое здесь остаётся навсегда.</p><h3>Новые усиления в пул</h3><div class="slist">${relics}</div><h3>Стартовые бонусы</h3><div class="slist">${perks}</div>
+  <div class="btns"><button class="btn pink" id="rlBack2">${S.run?'К карте':'Назад'}</button></div></div>`,'архив');
+  $('rl').querySelectorAll('[data-u]').forEach(b=>b.onclick=()=>{const r=RL_RELICS.find(x=>x.id===b.dataset.u);if(m.tapes<r.lock)return;m.tapes-=r.lock;m.unlocked.push(r.id);sfx.chest();save();rlArchive()});
+  $('rl').querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{const p=RL_PERKS.find(x=>x.id===b.dataset.p);if(m.tapes<p.cost)return;m.tapes-=p.cost;m.perks[p.id]=(m.perks[p.id]||0)+1;sfx.chest();save();rlArchive()});
+  $('rlBack2').onclick=()=>S.run?rlMapView():rlHome()}
+
+/* ---------- горячие клавиши (ПК) ---------- */
+document.addEventListener('keydown',e=>{if(e.ctrlKey||e.metaKey||e.altKey)return;const t=e.target;if(t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'))return;
+  if(!$('pc').hidden)return;if(rlActive){if(e.key==='Escape'&&overlay.hidden){e.preventDefault();rlClose()}return}const open=!overlay.hidden;
+  if(e.code==='KeyM'&&!open){rlOpen();return}
+  if(e.key==='Escape'){if(open){e.preventDefault();closeSheet()}return}
+  const fk={F1:'dailyBtn',F2:'roomBtn',F3:'shopBtn',F4:'wardBtn',F5:'menuBtn'}[e.key];
+  if(fk){e.preventDefault();if(open)closeSheet();setTimeout(()=>{const b=$(fk);b&&b.click()},open?180:0);return}
+  if(open)return;
+  if(e.code==='Space'){e.preventDefault();if(!e.repeat||true)$('spawnBtn').click();return}
+  const dk={Digit1:'convBtn',Digit2:'qualBtn',Digit3:'adBtn',Numpad1:'convBtn',Numpad2:'qualBtn',Numpad3:'adBtn'}[e.code];
+  if(dk){e.preventDefault();const b=$(dk);if(b&&!b.disabled)b.click();return}
+  if(e.code==='KeyE'){$('evBanner').click();return}
+  if(e.code==='KeyK'){$('bface').click();return}});
 /* ---------- K2DBG: управление для тестового стенда (в игре не видно) ---------- */
 window.K2DBG={
   start(){try{toDesk()}catch(e){}if(!streamOn)launchStream();setTimeout(()=>{for(let i=0;i<5;i++)if(!overlay.hidden)closeSheet()},REDUCED?50:1500);S.tut=5;save()},
@@ -1802,6 +2064,9 @@ window.K2DBG={
   recipe(){S.tut=5;const e=emptyCells();if(e.length<2)return;S.best=Math.max(S.best,6);S.cells[e[0]]=2;S.cells[e[1]]=6;renderCell(e[0]);renderCell(e[1]);recipeFound(1,cellsEl[e[1]]);S.cells[e[1]]=REC0+1;S.cells[e[0]]=null;shown[e[0]]=shown[e[1]]=undefined;renderCell(e[0]);renderCell(e[1])},
   mood(v){S.mood=v;renderMood()},
   toast(){toast('Тестовое уведомление: так выглядит alert в статус-баре')},
+  rl(){this.closeAll();rlOpen()},
+  rlwave(){this.closeAll();if(!S.run)rlNewRun();rlOpen();S.run.col=0;S.run.row=0;rlWave('fight')},
+  rlboss(){this.closeAll();if(!S.run)rlNewRun();rlOpen();S.run.col=6;S.run.row=0;rlWave('boss')},
   reset(){try{localStorage.removeItem(KEY)}catch(e){}location.reload()}
 };
 </script>
