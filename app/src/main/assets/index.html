@@ -1394,7 +1394,7 @@ $('evBanner').onclick=evIntro;
 
 /* ---------- sheets (glossy windows) ---------- */
 const overlay=$('overlay'),sheet=$('sheet');let queue=[];
-function openSheet(html,file){setTimeout(()=>{const x=sheet.querySelector('.whead span:last-child');if(x)x.onclick=()=>closeSheet();const b=sheet.querySelector('.body');if(b)b.scrollTop=0},0);sheet.innerHTML=`<div class="whead"><span>${file||'alert'}</span><span>[_][□][X]</span></div><div class="body">${html}</div>`;overlay.hidden=false}
+function openSheet(html,file){setTimeout(()=>{const x=sheet.querySelector('.whead span:last-child');if(x)x.onclick=()=>closeSheet();const b=sheet.querySelector('.body');if(b)b.scrollTop=0},0);sheet.innerHTML=`<div class="whead"><span>${file||'alert'}</span><span>[X]</span></div><div class="body">${html}</div>`;overlay.hidden=false}
 function closeSheet(){overlay.hidden=true;sheet.innerHTML='';const next=queue.shift();if(next)setTimeout(()=>{if(overlay.hidden)next();else queue.unshift(next)},150)}
 
 function showAd(onDone){let n=0;const T=12;
@@ -1871,7 +1871,7 @@ function fmtHM(d){return String(d.getHours()).padStart(2,'0')+':'+String(d.getMi
 function renderDesk(){$('wall').textContent=asciiFrom(Math.max(0,S.best));
   $('icons').innerHTML=DESK_ICONS.map(d=>`<button class="dicon" data-a="${d.id}"><pre>${d.art.replace(/</g,'&lt;')}</pre><span>${d.label}</span></button>`).join('');
   const lv=moodLv();
-  $('dwin').innerHTML=`<div class="whead"><span>stream.exe</span><span>[_][□][X]</span></div><div class="dbody"><pre class="avatar">${avatarArt(lv.face,false).replace(/</g,'&lt;')}</pre>
+  $('dwin').innerHTML=`<div class="whead"><span>stream.exe</span><span>[X]</span></div><div class="dbody"><pre class="avatar">${avatarArt(lv.face,false).replace(/</g,'&lt;')}</pre>
     <dl><dt>Стрим</dt><dd>#${S.stats.sessions}</dd><dt>Подписчики</dt><dd>${fmtInt(S.subs||0)}</dd><dt>Настроение</dt><dd>${lv.name}</dd><dt>Эфир</dt><dd>${schedLabel()}${schedStreak()?' · серия '+schedStreak():''}</dd><dt>Лучший артефакт</dt><dd>${NAMES[Math.max(0,S.best)]}</dd></dl>
     <div class="catsay"><pre> /\\_/\\\n( ^.^ )\n &gt; ^ &lt; </pre><span>Мяу! ${!sch().set?'Задай расписание: зрители любят стримы в одно время!':schedNow()&&sch().last!==schedDay(new Date())?'Эфир по расписанию! Зрители уже ждут!':streamOn?'Стрим на паузе, возвращаемся?':'Чат уже собирается, пора в эфир!'}</span></div>
     <button class="btn big go" data-a="stream">▶ ${streamOn?'ВЕРНУТЬСЯ В ЭФИР':'НАЧАТЬ СТРИМ'}</button></div>`;
