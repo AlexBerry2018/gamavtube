@@ -684,7 +684,7 @@ if(window.AndroidApp){navigator.vibrate=function(p){try{AndroidApp.vibrate(JSON.
       <span class="tright"><span class="clock" id="clock">00:00</span><button class="tb" id="startBtn">ПУСК</button><button class="tb" id="dailyBtn"><span class="fk">F1 </span>ДАРЫ<span class="dot" id="dailyDot" hidden>*</span></button><button class="tb" id="roomBtn"><span class="fk">F2 </span>КОМНАТА<span class="dot" id="roomDot" hidden>*</span></button><button class="tb" id="shopBtn"><span class="fk">F3 </span>ЛАРЁК</button><button class="tb" id="wardBtn"><span class="fk">F4 </span>ОБРАЗ<span class="dot" id="wardDot" hidden>*</span></button><button class="tb" id="menuBtn"><span class="fk">F5 </span>СИСТ<span class="dot" id="menuDot" hidden>*</span></button></span>
     </div>
     <div class="colL">
-      <section class="panel scopep camp"><span class="ttl" id="liveTtl">● LIVE · 0</span><pre class="camroom" aria-hidden="true">  ________                          .-------.
+      <section class="panel scopep camp"><span class="ttl" id="liveTtl">ОНЛАЙН · 0</span><pre class="camroom" aria-hidden="true">  ________                          .-------.
  |   |    |      ._______.          | Y 2 K |
  |---+----|      |=|=|=|=|          | *   * |
  |___|____|      '-------'          '-------'
@@ -1661,7 +1661,7 @@ function renderMood(){const m=S.mood==null?55:S.mood,k=Math.round(m/20),lv=moodL
     if(up&&lv.face==='party'&&Date.now()-hypeCut>300000){hypeCut=Date.now();cutin('В УДАРЕ!!','настроение на максимуме','eyes');chat('combo',4)}
     if(!up&&lv.face==='sad')for(let i=0;i<3;i++)setTimeout(()=>logChat(pick(REQ_NAMES),pick(CHAT.sad)),600+i*700)}moodShownLv=lv.name}
 function tickViewers(){const mt=Math.max(0,Math.min(100,15+18*Math.log10(Math.max(10,viewers||10))+wb('mood')-idlePen()));S.mood=(S.mood==null?55:S.mood)+(mt-(S.mood==null?55:S.mood))*.03;renderMood();const t=viewersTarget();if(!viewers)viewers=t;viewers+=(t-viewers)*.15+(Math.random()-.5)*Math.max(8,t*.05);viewers=Math.max(40,viewers);
-  viewersShown+=(viewers-viewersShown)*(viewersShown?.35:1);$('liveTtl').textContent=`● LIVE · ${fmtInt(viewersShown)}`}
+  viewersShown+=(viewers-viewersShown)*(viewersShown?.35:1);$('liveTtl').textContent=`ОНЛАЙН · ${fmtInt(viewersShown)}`}
 setInterval(tickViewers,1500);
 const SC_NAMES=['xXx_Lera_xXx','Kiber_Tim','~*Ksu*~','NeoHacker','dj_Vasya','Glitter_Girl','Millenium99','Flash_Max','Tamago4i','olds_2001','nya_nya','ModemMan'];
 const SC_MSG=['за кассету!','котик топ!','на новый модем','мяу!','спой что-нибудь','привет из 2003','с днём стрима!','на апгрейд Разгона','(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧','за Ядро 2000!'];

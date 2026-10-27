@@ -10,8 +10,8 @@ android {
         applicationId "ru.kristall2000.game"
         minSdk 24
         targetSdk 34
-        versionCode 8
-        versionName "0.8-test"
+        versionCode 9
+        versionName "0.9-test"
     }
 
     buildTypes {
