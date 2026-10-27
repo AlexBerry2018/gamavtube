@@ -656,6 +656,19 @@ html.desk .order.ready,html.desk .btn,html.desk .tb,html.desk .bface,html.desk .
 .rlopts{display:flex;flex-direction:column;gap:8px;align-items:stretch}
 @media (max-height:420px){.rlhome h2{font-size:.72rem}.rlnode{min-width:48px;padding:2px 4px}.rlnode span{display:none}.rlwave{grid-template-columns:minmax(0,1fr) minmax(120px,34%)}}
 @media (prefers-reduced-motion:reduce){.rlnode.can,.rltime.low{animation:none}}
+/* ===== обучение-тур ===== */
+.tour{position:fixed;inset:0;z-index:200}
+.tourhole{position:fixed;border:3px solid var(--red);box-shadow:0 0 0 9999px rgba(18,22,70,.58);pointer-events:none;transition:left .25s,top .25s,width .25s,height .25s}
+.tourcard{position:fixed;display:flex;flex-direction:column;gap:8px;padding:10px 12px;background:var(--bg2);color:var(--ph-hi);border:2px solid var(--ph);box-shadow:5px 5px 0 var(--red);font-family:var(--mono);text-shadow:none}
+.tourcard .tc-h{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.tourcard .tc-h b{font-family:var(--lcd);font-weight:400;font-size:.72rem;color:var(--ph);line-height:1.4}
+.tourcard .tc-h span{font-size:.62rem;opacity:.7;font-variant-numeric:tabular-nums}
+.tourcard p{margin:0;font-size:.74rem;line-height:1.45}
+.tourcard .tc-b{display:flex;gap:6px;align-items:center}.tourcard .tc-b span{flex:1}
+.tourcard .btn{padding:6px 10px;font-size:.66rem}
+.tourcard.narrow{padding:8px;gap:6px}.tourcard.narrow p{font-size:.64rem;line-height:1.38}.tourcard.narrow .btn{padding:5px 7px;font-size:.6rem}.tourcard.narrow [data-t=skip]{display:none}
+.tourcard .btn.pink{background:var(--ph);color:#fff}
+@media (prefers-reduced-motion:reduce){.tourhole{transition:none}}
 </style>
 <script>/* мост к Android: вибрация через нативный API */
 if(window.AndroidApp){navigator.vibrate=function(p){try{AndroidApp.vibrate(JSON.stringify(Array.isArray(p)?p:[p]))}catch(e){}return true}}</script>
@@ -702,7 +715,7 @@ ________________________________________________</pre><span class="camrec" aria-
         </div>
       </div>
       <section class="panel keyhelp" id="keyHelp"><span class="ttl">КЛАВИШИ</span>
-        <dl><dt>Пробел</dt><dd>Найти</dd><dt>1 · 2 · 3</dt><dd>Автозагрузка · Разгон · Бонус</dd><dt>F1–F5</dt><dd>Дары · Комната · Ларёк · Образ · Сист</dd><dt>E</dt><dd>Событие</dd><dt>K</dt><dd>Погладить кота</dd><dt>M</dt><dd>Ночной марафон</dd><dt>Esc</dt><dd>Закрыть окно</dd><dt>ЛКМ</dt><dd>Перетащить артефакт</dd></dl>
+        <dl><dt>Пробел</dt><dd>Найти</dd><dt>1 · 2 · 3</dt><dd>Автозагрузка · Разгон · Бонус</dd><dt>F1–F5</dt><dd>Дары · Комната · Ларёк · Образ · Сист</dd><dt>E</dt><dd>Событие</dd><dt>K</dt><dd>Погладить кота</dd><dt>M</dt><dd>Ночной марафон</dd><dt>H</dt><dd>Обучение</dd><dt>Esc</dt><dd>Закрыть окно</dd><dt>ЛКМ</dt><dd>Перетащить артефакт</dd></dl>
       </section>
     </div>
     <div class="sbar" aria-hidden="true"><span id="sbConn">Connected 0:00:00</span><span>Auto detect</span><span>56K</span><span class="off">SCROLL</span><span id="sbCaps">CAPS</span><span class="off">NUM</span></div>
@@ -1253,7 +1266,7 @@ function tutEnter(k){
   if(k===1){S.tutN=0;S.coins=Math.max(S.coins,spawnCost()*2+5)}
   if(k===2){let t=-1;S.cells.forEach(x=>{if(isItem(x)&&x>t)t=x});if(t<0){place(1);t=1}S.orders[0]={tier:t,reward:Math.max(60,Math.round(income(t)*45)),chest:false};renderOrders()}
   if(k===3)S.coins=Math.max(S.coins,convCost()+5)}
-function tutTick(){if(S.tut>=5){if(tutShown!==5){tutShown=5;clearTut()}return}
+function tutTick(){if(tourOn){clearTut();return}if(S.tut>=5){if(tutShown!==5){tutShown=5;clearTut()}return}
   if(S.tut===4){tutFinish();return}
   if(tutShown!==S.tut){tutShown=S.tut;tutEnter(S.tut);typeLine(TUT[S.tut].say+' '+smiles(1),'wink')}
   clearTut();if(overlay.hidden)(TUT[S.tut].el()||[]).forEach(e=>e&&e.classList.add('tut'))}
@@ -1407,8 +1420,8 @@ function showMenu(){const g=dustGain(),can=canPrestige();
   <h3>Статистика плейтеста</h3>
   <dl><dt>Сессий</dt><dd>${S.stats.sessions}</dd><dt>Время в игре</dt><dd>${dur(S.stats.playMs)}</dd><dt>Объединений</dt><dd>${S.stats.merges}</dd><dt>Заказов выполнено</dt><dd>${S.stats.orders}</dd><dt>Ежедневных подарков</dt><dd>${S.stats.dailies}</dd><dt>Сундуков открыто</dt><dd>${S.stats.chests}</dd><dt>Просмотров рекламы</dt><dd>${S.stats.ads}</dd><dt>Перезагрузок</dt><dd>${S.stats.prestiges}</dd><dt>Уровень канала</dt><dd>${chanLvl()} (+${chanLvl()*2}% доход)</dd><dt>Настроение</dt><dd>${Math.round(S.mood||0)} · ${moodLv().name}</dd><dt>Подписчиков</dt><dd>${(S.subs||0).toLocaleString('en-US').replace(/,/g,' ')}</dd><dt>Суперчатов</dt><dd>${S.stats.superchats||0}</dd><dt>Событий сыграно</dt><dd>${S.stats.events}</dd><dt>Рекорд бага</dt><dd>${fmt(S.ev.best)}</dd><dt>Доход</dt><dd>${fmt(totalIncome())}/с</dd></dl>
   <p style="font-size:.8rem">Данные хранятся только на этом устройстве.</p>
-  <div class="btns"><button class="btn danger" id="resetBtn">Стереть всё</button><button class="btn gel pink" id="closeBtn">Играть</button></div>`,'system.exe');
-  $('closeBtn').onclick=closeSheet;
+  <div class="btns"><button class="btn" id="tourBtn">Обучение заново</button><button class="btn danger" id="resetBtn">Стереть всё</button><button class="btn gel pink" id="closeBtn">Играть</button></div>`,'system.exe');
+  $('closeBtn').onclick=closeSheet;$('tourBtn').onclick=()=>{closeSheet();setTimeout(tourMain,200)};
   $('chatBtn').onclick=e=>{S.chat=!S.chat;e.currentTarget.classList.toggle('on',S.chat);e.currentTarget.textContent=S.chat?'Включён':'Выключен';applyChat();save()};
   $('budBtn').onclick=e=>{S.buddy=!S.buddy;e.currentTarget.classList.toggle('on',S.buddy);e.currentTarget.textContent=S.buddy?'Включён':'Выключен';applyBuddy();save();if(S.buddy)setTimeout(()=>buddy('welcome',null,true),300)};
   $('vibBtn').onclick=e=>{S.vib=S.vib===false;e.currentTarget.classList.toggle('on',S.vib);e.currentTarget.textContent=S.vib?'Включена':'Выключена';vib(40);save()};
@@ -1831,7 +1844,7 @@ function renderDesk(){$('wall').textContent=asciiFrom(Math.max(0,S.best));
 function deskAction(a){if(a==='off'){shutdown();return}launchStream();
   const after={room:showRoom,gifts:showDaily,event:evIntro,settings:showMenu,ward:showWardrobe,sched:showSched,shop:showShop,trip:showTrip,marathon:rlOpen}[a];if(after)setTimeout(after,streamOn?380:1400)}
 function launchStream(){const pc=$('pc');pc.classList.add('out');sfx.key('5');setTimeout(()=>{pc.hidden=true;pc.classList.remove('out');fitAll()},REDUCED?0:340);
-  if(!streamOn){streamOn=true;startUp();setTimeout(schedCheck,REDUCED?400:1800)}}
+  if(!streamOn){streamOn=true;startUp();setTimeout(schedCheck,REDUCED?400:1800);tourMaybe()}}
 function showDesk(){const pc=$('pc');renderDesk();pc.hidden=false;pc.classList.add('desk-on');$('desk').hidden=false;$('splash').hidden=true;$('bootTxt').hidden=true}
 function shutdown(){const pc=$('pc');$('desk').hidden=true;$('bootTxt').hidden=false;$('bootTxt').textContent='\n\n   Теперь питание компьютера можно отключить.\n\n   [ нажми, чтобы включить снова ]';pc.classList.remove('desk-on');pcBoot(true)}
 $('icons').addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(b)deskAction(b.dataset.a)});
@@ -1911,7 +1924,8 @@ function rlMapView(){const r=S.run,av=rlAvail(),W=8;
   const nodes=r.map.map((col,c)=>col.map((nd,j)=>{const can=c===r.col+1&&av.includes(j),here=c===r.col&&j===r.row,past=c<=r.col;
     return`<button class="rlnode t-${nd.t}${can?' can':''}${here?' here':''}${past&&!here?' past':''}" style="left:${(c+.5)/W*100}%;top:${nd.y*100}%" data-c="${c}" data-j="${j}" ${can?'':'disabled'} title="${RL_NODE[nd.t].n}"><b>${RL_NODE[nd.t].a}</b><span>${RL_NODE[nd.t].n}</span></button>`}).join('')).join('');
   rlFrame(`<div class="rlmap"><svg class="rledges" preserveAspectRatio="none">${lines}</svg>${nodes}</div><p class="rlhint">Выбери следующую точку маршрута. ☠ — сложнее, но награда лучше.</p>`,'карта');
-  $('rl').querySelectorAll('.rlnode.can').forEach(b=>b.onclick=()=>{r.col=+b.dataset.c;r.row=+b.dataset.j;save();rlEnter(r.map[r.col][r.row].t)})}
+  $('rl').querySelectorAll('.rlnode.can').forEach(b=>b.onclick=()=>{r.col=+b.dataset.c;r.row=+b.dataset.j;save();rlEnter(r.map[r.col][r.row].t)});
+  if(!(S.tours||{}).rlmap)setTimeout(()=>tourStart(TOUR_RL_MAP,'rlmap'),300)}
 function rlEnter(t){if(t==='fight'||t==='elite'||t==='boss')rlWave(t);else if(t==='event')rlEvent();else if(t==='shop')rlShop();else rlRest()}
 function rlNext(){const r=S.run;r.cleared=Math.max(r.cleared,r.col+1);rlMeta().best=Math.max(rlMeta().best,r.cleared);save();rlMapView()}
 function rlDamage(n,why){const r=S.run;r.hp-=n;if(r.hp<=0&&rlHas('second')&&r.second){r.second=false;r.hp=1;toast('Второй шанс спас забег!');sfx.fanfare()}
@@ -1934,7 +1948,7 @@ function rlWave(t){const r=S.run,fl=r.col+1,cols=rlHas('wide')?6:5,rows=4,boss=t
   attachDrag(g,{get:i=>RW?RW.cells[i]:null,fixed:i=>!RW||RW.cells[i]===BAD||RW.cells[i]===BOSS,
     targetAt(x,y){const el=document.elementFromPoint(x,y);const c=el&&el.closest('.cell');return c&&g.contains(c)?{type:'cell',i:+c.dataset.i,el:c}:null},
     onTap(){},onDrop(from,tg){rwDrop(from,tg.i)}});
-  rwT=setInterval(rwTick,100);rwHud();
+  rwT=setInterval(rwTick,100);rwHud();if(!(S.tours||{}).rlwave)setTimeout(()=>tourStart(TOUR_RL_WAVE,'rlwave'),250);
   if(boss){cutin('БОСС!!','Миллениум-баг','shock')}else if(elite)cutin('ПРОКЛЯТЫЙ ЭФИР','очков нужно больше','shock')}
 function rwRender(i){const g=$('rlGrid');if(!g||!RW)return;const el=g.children[i],t=RW.cells[i];if(!el)return;
   el.innerHTML=t===null?'':`<div class="gem">${gemSVG(t)}</div><span class="lvl">${t===BOSS?'♥'+RW.boss.hp:lvlOf(t)}</span>`;
@@ -1958,7 +1972,7 @@ function rwHud(){if(!RW)return;const left=Math.max(0,RW.end-Date.now()),boss=!!R
   const g=$('rwGoal');if(!g)return;g.textContent=boss?`БАГ ♥ ${RW.boss.hp}/${RW.boss.max}`:`${fmtInt(RW.score)} / ${fmtInt(RW.target)}`;
   $('rwBar').style.width=(p*100)+'%';$('rwTime').textContent=mmss(left);$('rwTime').classList.toggle('low',left<10000);
   $('rwCombo').textContent=RW.combo>1&&Date.now()-RW.lastM<(rlHas('combo')?3000:2000)?`КОМБО ×${RW.combo}`:''}
-function rwTick(){if(!RW||RW.done)return;const now=Date.now();
+function rwTick(){if(!RW||RW.done)return;if(tourOn){RW.end+=100;RW.spawnAt+=100;RW.hateT+=100;RW.bossT+=100;return}const now=Date.now();
   if(now>=RW.spawnAt){RW.nSpawn++;const t=rlHas('nostalgia')&&RW.nSpawn%4===0?1:0;if(!rwPlace(t)){rwFail('Поле переполнилось!');return}RW.spawnAt=now+RW.spInt*1000}
   if(rlCurse('haters')&&!rlHas('antivir')&&now>RW.hateT){RW.hateT=now+12000;const e=RW.cells.map((x,i)=>x===null?i:-1).filter(i=>i>=0);if(e.length){const i=pick(e);RW.cells[i]=BAD;rwRender(i)}}
   if(RW.boss&&now>RW.bossT){RW.bossT=now+8000;if(!rlHas('antivir')||Math.random()<.4){const e=nbrs(RW.boss.i,RW.cols,RW.cells.length).filter(i=>RW.cells[i]===null);const all=RW.cells.map((x,i)=>x===null?i:-1).filter(i=>i>=0);const pool=e.length?e:all;if(pool.length){const i=pick(pool);RW.cells[i]=BAD;rwRender(i);sfx.deny()}}}
@@ -2030,6 +2044,58 @@ function rlArchive(){const m=rlMeta();const relics=RL_RELICS.filter(r=>r.lock).m
   $('rl').querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{const p=RL_PERKS.find(x=>x.id===b.dataset.p);if(m.tapes<p.cost)return;m.tapes-=p.cost;m.perks[p.id]=(m.perks[p.id]||0)+1;sfx.chest();save();rlArchive()});
   $('rlBack2').onclick=()=>S.run?rlMapView():rlHome()}
 
+/* ---------- ОБУЧЕНИЕ: тур с подсветкой ---------- */
+const TOUR_MAIN=[
+ {el:()=>[$('startBtn')?.closest('.term')],t:'Добро пожаловать в эфир!',d:'Это пульт стримерши из 2000-х. Коротко покажу, какое окно за что отвечает. Листай кнопкой «Далее» или стрелками.',center:true},
+ {el:()=>[document.querySelector('.camp')],t:'Камера и онлайн',d:'Твоя стримерша в прямом эфире. Сверху — сколько зрителей смотрит. Больше зрителей — веселее стримерша и щедрее донаты. Нажми на неё, чтобы погладить.'},
+ {el:()=>[$('goalLine')],t:'Сбор чата',d:'Суперчаты от зрителей наполняют эту полоску. Когда сбор закрыт, чат покупает технику для стрима с постоянным бонусом, и она появляется на камере.'},
+ {el:()=>[$('moodBox')],t:'Настроение',d:'Сердечки — настроение. Весёлая стримерша приносит до +30% дохода, грустная −15%. Растёт от онлайна и игры, падает, если долго ничего не делать.'},
+ {el:()=>[$('bface')?.closest('.buddy')],t:'Кот-помощник',d:'Кот подсказывает, что делать дальше. Нажми на кота, чтобы забанить тролля в чате. Ещё его можно отправить на барахолку за находками.'},
+ {el:()=>[document.querySelector('.chatp')],t:'Чат и просьбы',d:'Зрители просят артефакты и дают задания. Перетащи нужный артефакт на просьбу или нажми «ОТДАТЬ», когда она подсветится. Награда — монеты и подписчики.'},
+ {el:()=>[document.querySelector('.boardp')],t:'Хранилище',d:'Главное поле. Перетащи артефакт на такой же — получится следующий, ценнее. Каждый артефакт на поле приносит монеты каждую секунду. В заголовке видно, какой артефакт следующий.'},
+ {el:()=>[document.querySelector('.lcdbox')],t:'Ресурсы',d:'Монеты и доход в секунду. Ниже — подписчики: когда набираешь цель, канал получает новый уровень и открываются вещи в Образе.'},
+ {el:()=>[$('evBanner')],t:'Событие',d:'Раз в 12 часов открывается мини-событие: гонка за очками на отдельном поле с крупными наградами.'},
+ {el:()=>[$('spawnBtn')],t:'Найти',d:'Покупает новый артефакт на поле. Цена каждой следующей покупки чуть выше.'},
+ {el:()=>[$('convBtn')],t:'Автозагрузка',d:'Сама кладёт артефакты на поле, пока ты смотришь. Каждый уровень — чаще.'},
+ {el:()=>[$('qualBtn')],t:'Разгон',d:'Улучшает находки: со временем на поле сразу падают артефакты получше.'},
+ {el:()=>[$('adBtn')],t:'Бонус',d:'Удваивает доход на 2 минуты за просмотр ролика.'},
+ {el:()=>[$('dailyBtn'),$('roomBtn'),$('shopBtn'),$('wardBtn'),$('menuBtn')],t:'Верхнее меню',d:'ДАРЫ — подарок каждый день. КОМНАТА — полки для наборов и мебель. ЛАРЁК — энергетики и флешки за монеты. ОБРАЗ — одежда стримерши и кота. СИСТ — настройки, коллекция и рецепты.'},
+ {el:()=>[$('startBtn')],t:'Пуск',d:'Рабочий стол компьютера: Ночной марафон, Кот-курьер, Расписание стримов, События. Туда же можно вернуться в любой момент.'},
+ {el:()=>[document.querySelector('.sbar')],t:'Строка уведомлений',d:'Внизу появляются короткие сообщения «alert»: что получено, что изменилось. Повторить это обучение можно в СИСТ.'},
+ {el:()=>[document.querySelector('.boardp')],t:'Поехали!',d:'Начнём с главного: перетащи один Стразик на другой.'}];
+const TOUR_RL_MAP=[
+ {el:()=>[document.querySelector('.rlhud')],t:'Сигнал и забег',d:'Сигнал — твои жизни в марафоне. Рядом — монеты забега, этаж и собранные усиления. Красным подсвечены проклятия.'},
+ {el:()=>[document.querySelector('.rlmap')],t:'Карта ночи',d:'Маршрут идёт слева направо к боссу BUG. >_ — эфир, ☠ — проклятый эфир, ? — событие, $ — ларёк, ♥ — отдых.'},
+ {el:()=>[document.querySelector('.rlnode.can')],t:'Выбери точку',d:'Подсвечены точки, куда можно пойти. Каждый выбор открывает новые развилки.'}];
+const TOUR_RL_WAVE=[
+ {el:()=>[document.querySelector('.rlbrd')],t:'Эфир-волна',d:'Артефакты падают сами и всё быстрее. Объединяй одинаковые, чтобы набирать очки. Если поле переполнится — эфир провален.'},
+ {el:()=>[document.querySelector('.rlside')],t:'Цель и время',d:'Набери нужные очки до конца таймера. Слияния подряд дают комбо и множитель очков.'}];
+let tourOn=null;
+function tourStart(steps,key,onDone){if(tourOn)tourEnd(true);let k=0;const root=document.createElement('div');root.className='tour';root.innerHTML='<div class="tourhole"></div><div class="tourcard" role="dialog" aria-live="polite"></div>';document.body.appendChild(root);
+  const list=steps.filter(s=>{const els=(s.el()||[]).filter(Boolean);return s.center||els.some(e=>e.getClientRects().length&&e.offsetParent!==null)});
+  tourOn={root,list,key,onDone,go:i=>{k=Math.max(0,Math.min(list.length-1,i));show()},next:()=>k<list.length-1?(k++,show()):tourEnd(false),prev:()=>{if(k>0){k--;show()}}};
+  const show=()=>{const s=list[k],hole=root.querySelector('.tourhole'),card=root.querySelector('.tourcard');
+    const els=(s.el()||[]).filter(e=>e&&e.getClientRects().length);let r=null;
+    els.forEach(e=>{const b=e.getBoundingClientRect();r=r?{l:Math.min(r.l,b.left),t:Math.min(r.t,b.top),r:Math.max(r.r,b.right),b:Math.max(r.b,b.bottom)}:{l:b.left,t:b.top,r:b.right,b:b.bottom}});
+    const pad=6,W=innerWidth,H=innerHeight;
+    if(!r||s.center){hole.style.cssText=`left:${W/2}px;top:${H/2}px;width:0;height:0`}else hole.style.cssText=`left:${r.l-pad}px;top:${r.t-pad}px;width:${r.r-r.l+pad*2}px;height:${r.b-r.t+pad*2}px`;
+    card.innerHTML=`<div class="tc-h"><b>${s.t}</b><span>${k+1}/${list.length}</span></div><p>${s.d}</p><div class="tc-b"><button class="btn" data-t="skip">Пропустить</button><span></span>${k?'<button class="btn" data-t="prev">Назад</button>':''}<button class="btn pink" data-t="next">${k===list.length-1?'Готово':'Далее'}</button></div>`;
+    card.querySelector('[data-t=next]').onclick=tourOn.next;card.querySelector('[data-t=skip]').onclick=()=>tourEnd(false);const pv=card.querySelector('[data-t=prev]');if(pv)pv.onclick=tourOn.prev;
+    const cw=Math.min(360,W-24);card.style.width=cw+'px';const ch=card.offsetHeight;let x,y;
+    if(!r||s.center){x=(W-cw)/2;y=(H-ch)/2}else{const below=H-r.b,above=r.t,right=W-r.r,left=r.l;
+      const side=Math.max(right,left),sw=Math.min(360,side-28);
+      card.classList.remove('narrow');if((below<ch+20&&above<ch+20||r.b-r.t>H*.45)&&sw>=200){card.style.width=sw+'px';card.classList.toggle('narrow',sw<300);const ch2=card.offsetHeight;y=Math.min(H-ch2-10,Math.max(10,(r.t+r.b)/2-ch2/2));x=right>=left?r.r+14:r.l-sw-14}
+      else if(right>=cw+20&&r.b-r.t>ch*.6){x=r.r+14;y=Math.min(H-ch-10,Math.max(10,r.t))}else if(left>=cw+20&&r.b-r.t>ch*.6){x=r.l-cw-14;y=Math.min(H-ch-10,Math.max(10,r.t))}
+      else if(below>=ch+20){y=r.b+14;x=Math.min(W-cw-10,Math.max(10,(r.l+r.r)/2-cw/2))}else if(above>=ch+20){y=r.t-ch-14;x=Math.min(W-cw-10,Math.max(10,(r.l+r.r)/2-cw/2))}
+      else{x=(W-cw)/2;y=H-ch-10}}
+    card.style.left=Math.round(x)+'px';card.style.top=Math.round(y)+'px';sfx.key(String((k%9)+1))};
+  tourOn.show=show;show()}
+function tourEnd(silent){if(!tourOn)return;const t=tourOn;tourOn=null;t.root.remove();if(t.key){(S.tours=S.tours||{})[t.key]=1;save()}if(!silent&&t.onDone)t.onDone()}
+addEventListener('resize',()=>{if(tourOn)tourOn.show()});
+document.addEventListener('keydown',e=>{if(!tourOn)return;if(e.key==='ArrowRight'||e.key==='Enter'){e.preventDefault();e.stopImmediatePropagation();tourOn.next()}else if(e.key==='ArrowLeft'){e.preventDefault();e.stopImmediatePropagation();tourOn.prev()}else if(e.key==='Escape'){e.preventDefault();e.stopImmediatePropagation();tourEnd(false)}else{e.stopImmediatePropagation()}},true);
+function tourMain(){if(!overlay.hidden)closeSheet();tourStart(TOUR_MAIN,'main',()=>{if(S.tut<5){tutShown=-1;tutTick()}})}
+function tourMaybe(){if((S.tours||{}).main||tourOn)return;setTimeout(()=>{if(!overlay.hidden){setTimeout(tourMaybe,800);return}if(!(S.tours||{}).main&&!tourOn)tourMain()},REDUCED?100:1200)}
+
 /* ---------- горячие клавиши (ПК) ---------- */
 document.addEventListener('keydown',e=>{if(e.ctrlKey||e.metaKey||e.altKey)return;const t=e.target;if(t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'))return;
   if(!$('pc').hidden)return;if(rlActive){if(e.key==='Escape'&&overlay.hidden){e.preventDefault();rlClose()}return}const open=!overlay.hidden;
@@ -2042,11 +2108,12 @@ document.addEventListener('keydown',e=>{if(e.ctrlKey||e.metaKey||e.altKey)return
   const dk={Digit1:'convBtn',Digit2:'qualBtn',Digit3:'adBtn',Numpad1:'convBtn',Numpad2:'qualBtn',Numpad3:'adBtn'}[e.code];
   if(dk){e.preventDefault();const b=$(dk);if(b&&!b.disabled)b.click();return}
   if(e.code==='KeyE'){$('evBanner').click();return}
-  if(e.code==='KeyK'){$('bface').click();return}});
+  if(e.code==='KeyK'){$('bface').click();return}
+  if(e.code==='KeyH'){tourMain();return}});
 /* ---------- K2DBG: управление для тестового стенда (в игре не видно) ---------- */
 window.K2DBG={
-  start(){try{toDesk()}catch(e){}if(!streamOn)launchStream();setTimeout(()=>{for(let i=0;i<5;i++)if(!overlay.hidden)closeSheet()},REDUCED?50:1500);S.tut=5;save()},
-  closeAll(){for(let i=0;i<6;i++)if(!overlay.hidden)closeSheet()},
+  start(){S.tours=Object.assign({main:1,rlmap:1,rlwave:1},S.tours||{});try{toDesk()}catch(e){}if(!streamOn)launchStream();setTimeout(()=>{for(let i=0;i<5;i++)if(!overlay.hidden)closeSheet()},REDUCED?50:1500);S.tut=5;save()},
+  closeAll(){if(tourOn)tourEnd(true);for(let i=0;i<6;i++)if(!overlay.hidden)closeSheet()},
   mid(){S.tut=5;S.best=7;S.codex=7;S.coins=Math.max(S.coins,2e5);S.conv=Math.max(S.conv,4);S.subs=Math.max(S.subs||0,700);S.subGoalIx=Math.max(S.subGoalIx||0,3);S.mood=70;
     S.cells=S.cells.map((x,i)=>x===BAD?null:(i%3===0?null:2+(i*7)%6));shown=Array(N).fill(undefined);renderBoard();ensureOrders();save()},
   era2(){S.tut=5;S.best=12;S.codex=12;S.cells=S.cells.map((x,i)=>x===BAD?null:(i%2?null:9+(i%4)));shown=Array(N).fill(undefined);renderBoard();ensureOrders();save()},
@@ -2064,6 +2131,7 @@ window.K2DBG={
   recipe(){S.tut=5;const e=emptyCells();if(e.length<2)return;S.best=Math.max(S.best,6);S.cells[e[0]]=2;S.cells[e[1]]=6;renderCell(e[0]);renderCell(e[1]);recipeFound(1,cellsEl[e[1]]);S.cells[e[1]]=REC0+1;S.cells[e[0]]=null;shown[e[0]]=shown[e[1]]=undefined;renderCell(e[0]);renderCell(e[1])},
   mood(v){S.mood=v;renderMood()},
   toast(){toast('Тестовое уведомление: так выглядит alert в статус-баре')},
+  tour(){this.closeAll();tourMain()},
   rl(){this.closeAll();rlOpen()},
   rlwave(){this.closeAll();if(!S.run)rlNewRun();rlOpen();S.run.col=0;S.run.row=0;rlWave('fight')},
   rlboss(){this.closeAll();if(!S.run)rlNewRun();rlOpen();S.run.col=6;S.run.row=0;rlWave('boss')},
