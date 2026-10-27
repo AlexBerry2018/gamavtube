@@ -670,6 +670,40 @@ html.desk .order.ready,html.desk .btn,html.desk .tb,html.desk .bface,html.desk .
 .tourcard.narrow{padding:8px;gap:6px}.tourcard.narrow p{font-size:.64rem;line-height:1.38}.tourcard.narrow .btn{padding:5px 7px;font-size:.6rem}.tourcard.narrow [data-t=skip]{display:none}
 .tourcard .btn.pink{background:var(--ph);color:#fff}
 @media (prefers-reduced-motion:reduce){.tourhole{transition:none}}
+
+/* ---- вертикальный режим: поле главное ---- */
+html.vert[data-ph] .term{gap:6px}
+html.vert[data-ph] .sbar,html.vert[data-ph] .clock,html.vert[data-ph] .fk{display:none}
+html.vert[data-ph] .tbar{flex-wrap:nowrap;gap:6px}
+html.vert[data-ph] .prompt{flex:none;font-size:.6rem}
+html.vert[data-ph] #streamTitle,html.vert[data-ph] .prompt .cur{display:none}
+html.vert[data-ph] .tright{flex:1 1 auto;min-width:0;flex-wrap:nowrap;justify-content:flex-start;gap:3px;overflow-x:auto;scrollbar-width:none}
+html.vert[data-ph] .tright::-webkit-scrollbar{display:none}
+html.vert[data-ph] .tb{font-size:.52rem;padding:1px 3px;flex:none}
+html.vert[data-ph] .colL{display:grid;grid-template-columns:104px minmax(0,1fr);grid-template-rows:auto auto auto;gap:4px 8px}
+html.vert[data-ph] .camp{grid-column:1;grid-row:1/3;height:66px;padding:16px 2px 2px}
+html.vert[data-ph] .camp .ttl{font-size:.5rem;padding:1px 4px}
+html.vert[data-ph] .camroom,html.vert[data-ph] .camgoal,html.vert[data-ph] .camrec,html.vert[data-ph] .camp #scope{display:none}
+html.vert[data-ph] .avatar{font-size:.3rem;line-height:1.05}
+html.vert[data-ph] .mood{grid-column:2;grid-row:1;font-size:.56rem;align-self:end}
+html.vert[data-ph] .buddy{grid-column:2;grid-row:2;min-height:0;margin:0;align-self:start}
+html.vert[data-ph] .bface{font-size:.46rem;line-height:1.05}
+html.vert[data-ph] .hint{font-size:.58rem}
+html.vert[data-ph] .chatp{grid-column:1/-1;grid-row:3}
+html.vert[data-ph] .orders{max-height:4.6rem;overflow-y:auto}
+html.vert[data-ph] .colC{flex:1 1 auto;min-height:0}
+html.vert[data-ph] .colR{display:grid;grid-template-columns:minmax(0,1fr);gap:5px}
+html.vert[data-ph] .lcdbox{flex-direction:row;flex-wrap:wrap;align-items:center;gap:2px 10px;padding:3px 8px}
+html.vert[data-ph] .lcdbox>.ttl{display:none}
+html.vert[data-ph] .lcd{font-size:1.4rem}
+html.vert[data-ph] .meta,html.vert[data-ph] .subs{font-size:.56rem}
+html.vert[data-ph] .alert{padding:2px 8px;font-size:.6rem}
+html.vert[data-ph] .ctrls{display:grid;grid-template-columns:1.15fr 2fr;gap:6px}
+html.vert[data-ph] .big{font-size:.95rem;padding:6px 8px;flex-direction:column;align-items:flex-start;justify-content:center;gap:0}
+html.vert[data-ph] .big .c{font-size:.7rem}
+html.vert[data-ph] .keys{gap:5px}
+html.vert[data-ph] .k{display:flex;flex-direction:column;justify-content:center;padding:4px 4px 6px;font-size:.52rem}
+html.vert[data-ph] .k .m,html.vert[data-ph] .k .d{display:none}
 </style>
 <script>/* мост к Android: вибрация через нативный API */
 if(window.AndroidApp){navigator.vibrate=function(p){try{AndroidApp.vibrate(JSON.stringify(Array.isArray(p)?p:[p]))}catch(e){}return true}}</script>
