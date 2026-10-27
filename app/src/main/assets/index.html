@@ -310,6 +310,8 @@ html.vert .artbg{display:none!important}
 :root[data-ph="paper"] .alert .bang{background:var(--red);color:#fff}
 :root[data-ph="paper"] .alert .et b,:root[data-ph="paper"] .alert .eg{color:var(--red)}
 :root[data-ph="paper"] .order.ready{border-color:var(--ph);background:var(--ph);color:#fff;box-shadow:3px 3px 0 var(--red)}
+.order.hurry{border-color:var(--red)!important;animation:hurry .8s steps(2) infinite}.order.hurry .st{color:var(--red)}.order.ready.hurry .st{color:#fff}
+@keyframes hurry{50%{box-shadow:3px 3px 0 var(--red),0 0 0 2px var(--red)}}
 :root[data-ph="paper"] .order.ready i,:root[data-ph="paper"] .order.ready em,:root[data-ph="paper"] .order.ready .or,:root[data-ph="paper"] .order.ready .qi{color:#fff}
 :root[data-ph="paper"] .order.ready .st{color:var(--ph);background:#fff;padding:0 4px;font-weight:700;animation:none}
 :root[data-ph="paper"] .order.ready .dl{border-color:rgba(255,255,255,.5)}
@@ -762,7 +764,7 @@ const NAMES=['Стразик','Заколка-бабочка','Кассета','
 const HUES=[320,270,30,200,175,195,185,330,280,90,190,300,50,330,45,20,230,345,220,240,215,100,220,180];
 const MAX=NAMES.length-1,N=30,KEY='crystal-mine-v2'+(()=>{try{return new URLSearchParams(location.search).get('slot')||''}catch(e){return''}})(),OFFLINE_CAP=2*3600*1000,OFFLINE_RATE=0.5;
 /* economy v2 — tuned with balance_v2.py */
-const CONV_MAX=8,PRESTIGE_TIER=5,DUST_BONUS=0.1,Q_STEP=9,Q0=1000,QG=2.3,SP0=5,SPG=2.3,SPN=1.1,C0=150,CG=5,ORD_K=40,ORD_CD=90000,CHEST_EVERY=6,BASE_MAX=7,BASE_GAP=3,START_K=.25;
+const CONV_MAX=8,PRESTIGE_TIER=5,DUST_BONUS=0.1,Q_STEP=10,Q0=1000,QG=2.4,SP0=5,SPG=2.3,SPN=1.12,C0=150,CG=5,ORD_K=40,ORD_CD=90000,CHEST_EVERY=6,BASE_MAX=7,BASE_GAP=3,START_K=.25;
 const income=t=>Math.pow(2.6,t);
 let BC=6;
 const J=100,GEN=101,BAD=102,BOSS=104,GEN_INT=20;
@@ -876,7 +878,8 @@ const upChance=()=>(S.qual%Q_STEP)/Q_STEP*.6+(setDone('fashion')?.1:0);
 const roll=()=>Math.min(MAX,baseTier()+(Math.random()<upChance()?1:0));
 const boosted=()=>S.boostUntil>Date.now();
 const turbo=()=>(S.turboUntil||0)>Date.now();
-const totalIncome=()=>baseIncome()*mult()*(boosted()?2:1)*(turbo()?2:1);
+const badPen=()=>S.tut<5?1:Math.max(.7,1-.04*S.cells.filter(t=>t===BAD).length);
+const totalIncome=()=>baseIncome()*mult()*badPen()*(boosted()?2:1)*(turbo()?2:1);
 const refIncome=()=>Math.max(baseIncome()*mult(),2);
 const THEMES=[
  {id:'flea',name:'Барахолка',art:'[$$]',desc:'НАЙТИ дешевле на 40%'},
@@ -1105,13 +1108,14 @@ function discover(t,el){if(t<=S.best)return;S.best=t;if(t>S.codex)S.codex=t;cons
 /* ---------- orders (pager messages) ---------- */
 const REQ_NAMES=['xXx_Lera_xXx','Kiber_Tim','~*Ksu*~','NeoHacker','dj_Vasya','Glitter_Girl','Millenium99','Flash_Max','Tamago4i','olds_2001','nya_nya','ModemMan','old_school','pager_girl'];
 const REQ_VERB=['покажи','хочу','дай','где','скинь'];
-const OK=o=>o.kind||'give',QUEST_TIME=60000;
+const OK=o=>o.kind||'give',QUEST_TIME=60000,PATIENCE=()=>Math.round((150+Math.random()*90)*1000),hasLeft=o=>{const k=OK(o);return k==='give'||k==='many'};
+const leftTxt=o=>hasLeft(o)&&o.left!=null?' '+mmss(Math.max(0,o.left)):'';
 function shelfFree(){return SETS.some(st=>st.items.some(t=>!(S.room||[]).includes(t)))}
 function newOrder(){S.orderSeq++;const user=pick(REQ_NAMES),chest=S.orderSeq%CHEST_EVERY===0,R=refIncome(),lk=(setDone('link')?1.3:1)*(setDone('mobile')?1.2:1)*(th('challenge')?2:1),used=S.orders.map(OK),pool=['give','give','give'];
   if(S.tut>=5&&S.best>=2){if(!used.includes('many'))pool.push('many');if(!used.includes('merge'))pool.push('merge');if(!used.includes('spawn'))pool.push('spawn');if(!used.includes('event')&&S.ev&&Date.now()>=S.ev.next)pool.push('event','event');if(!used.includes('shelf')&&shelfFree())pool.push('shelf');if(!used.includes('sing')&&Date.now()-(S.singT||0)>30*60000)pool.push('sing','sing');if(!used.includes('wheel')&&S.wheelDay!==today())pool.push('wheel','wheel')}
   const kind=pick(pool),hi=Math.max(0,S.best-1),lo=Math.max(0,Math.min(hi,S.best-4)),tier=lo+Math.floor(Math.random()*(hi-lo+1));
-  if(kind==='give')return{kind,tier,user,verb:pick(REQ_VERB),reward:Math.round((income(tier)*ORD_K*mult()+R*20)*lk),chest};
-  if(kind==='many'){const t=Math.max(baseTier(),Math.min(tier,S.best-2));return{kind,tier:t,need:3,user,reward:Math.round((income(t)*ORD_K*mult()*2.5+R*30)*lk),chest}}
+  if(kind==='give')return{kind,tier,left:PATIENCE(),user,verb:pick(REQ_VERB),reward:Math.round((income(tier)*ORD_K*mult()+R*20)*lk),chest};
+  if(kind==='many'){const t=Math.max(baseTier(),Math.min(tier,S.best-2));return{kind,tier:t,need:3,left:PATIENCE()*1.4,user,reward:Math.round((income(t)*ORD_K*mult()*2.5+R*30)*lk),chest}}
   if(kind==='merge'){const need=pick([4,5,6]);return{kind,need,n:0,until:0,user,reward:Math.round(R*(10+need*3)*lk),chest}}
   if(kind==='spawn'){const need=pick([4,5,6]);return{kind,need,n:0,user,reward:Math.round(R*(8+need*2)*lk),chest}}
   if(kind==='event')return{kind,need:1,n:0,user,reward:Math.round(R*60*lk),chest};
@@ -1125,12 +1129,12 @@ function questProg(kind){let hit=false;const now=Date.now();S.orders.forEach(o=>
   if(hit)renderOrders()}
 function oText(o){const k=OK(o);return k==='give'?`${o.verb||'покажи'} <em>${NAMES[o.tier]}</em>`:k==='many'?`собери <em>3× ${NAMES[o.tier]}</em>`:k==='merge'?`быстро <em>${o.need} слияний</em>`:k==='spawn'?`жми <em>НАЙТИ ×${o.need}</em>`:k==='event'?`запусти <em>событие</em>`:k==='raid'?`рейд! <em>${o.need} слияний</em>`:k==='sing'?`спой <em>караоке!</em>`:k==='wheel'?`крутани <em>колесо!</em>`:k==='troll'?`<em>${o.text}</em>`:`поставь вещь <em>на полку</em>`}
 function oIcon(o){const k=OK(o);return k==='give'||k==='many'?gemSVG(o.tier):`<b class="qi">${{merge:'&gt;&lt;',spawn:'??',event:'!!',shelf:'[_]',raid:'&gt;&gt;',troll:'&gt;:(',sing:'♪♫',wheel:'(*)'}[k]}</b>`}
-function oState(o,r){const k=OK(o),now=Date.now();if(k==='sing'||k==='wheel')return'ИГРАТЬ ▶';if(k==='troll')return`БАН ▶ ${Math.max(0,Math.ceil((o.until-now)/1000))}с`;if(r)return k==='give'||k==='many'?'ОТДАТЬ ▶':'ЗАБРАТЬ ▶';if(k==='raid')return`[${o.n}/${o.need} ${Math.max(0,Math.ceil((o.until-now)/1000))}с]`;if(k==='give')return'[ЖДЁТ]';if(k==='many')return`[${cntTier(o.tier)}/${o.need}]`;
+function oState(o,r){const k=OK(o),now=Date.now();if(k==='sing'||k==='wheel')return'ИГРАТЬ ▶';if(k==='troll')return`БАН ▶ ${Math.max(0,Math.ceil((o.until-now)/1000))}с`;if(r)return k==='give'||k==='many'?'ОТДАТЬ ▶'+leftTxt(o):'ЗАБРАТЬ ▶';if(k==='raid')return`[${o.n}/${o.need} ${Math.max(0,Math.ceil((o.until-now)/1000))}с]`;if(k==='give')return`[ЖДЁТ${leftTxt(o)}]`;if(k==='many')return`[${cntTier(o.tier)}/${o.need}${leftTxt(o)}]`;
   if(k==='merge'&&o.until>now)return`[${o.n}/${o.need} ${Math.ceil((o.until-now)/1000)}с]`;return`[${k==='merge'?0:o.n}/${o.need}]`}
-function ordersKey(){const now=Date.now();return S.orders.map(o=>oState(o,oReady(o))).join('|')+(S.orders.some(o=>(o.kind==='merge'||o.kind==='raid'||o.kind==='troll')&&o.until>now)?Math.floor(now/1000):'')}
+function ordersKey(){const now=Date.now();return S.orders.map(o=>oState(o,oReady(o))).join('|')+(S.orders.some(o=>(o.kind==='merge'||o.kind==='raid'||o.kind==='troll')&&o.until>now||hasLeft(o)&&o.left!=null)?Math.floor(now/1000):'')}
 function ensureOrders(){const now=Date.now();S.ordPending=(S.ordPending||[]).filter(x=>x>now);const regN=()=>S.orders.filter(o=>o.kind!=='raid'&&o.kind!=='troll').length;while(regN()+S.ordPending.length<3)S.orders.push(newOrder());renderOrders()}
 function hasTier(t){return S.cells.indexOf(t)}
-function renderOrders(){const now=Date.now();$('orders').innerHTML=S.orders.map((o,k)=>{const r=oReady(o);return`<button class="order req${r&&OK(o)!=='troll'?' ready':''}${OK(o)!=='give'?' quest q-'+OK(o):''}" data-k="${k}"><span class="oi">${oIcon(o)}</span><span class="on"><i>${o.user||'viewer'}:</i><span class="rq">${oText(o)}</span></span><span class="dl"></span><span class="or">${o.reward?'+'+fmt(o.reward):'??'}</span><span class="st">${o.chest?'+СУНДУК ':''}${oState(o,r)}</span></button>`}).join('')+(S.ordPending||[]).filter(x=>x>now).map(x=>`<div class="order req wait"><span class="oi"><b class="qi">...</b></span><span class="on"><i>чат:</i><span class="rq">печатает...</span></span><span class="dl"></span><span class="or">${mmss(x-now)}</span><span class="st">[...]</span></div>`).join('')}
+function renderOrders(){const now=Date.now();$('orders').innerHTML=S.orders.map((o,k)=>{const r=oReady(o);return`<button class="order req${r&&OK(o)!=='troll'?' ready':''}${hasLeft(o)&&o.left!=null&&o.left<30000?' hurry':''}${OK(o)!=='give'?' quest q-'+OK(o):''}" data-k="${k}"><span class="oi">${oIcon(o)}</span><span class="on"><i>${o.user||'viewer'}:</i><span class="rq">${oText(o)}</span></span><span class="dl"></span><span class="or">${o.reward?'+'+fmt(o.reward):'??'}</span><span class="st">${o.chest?'+СУНДУК ':''}${oState(o,r)}</span></button>`}).join('')+(S.ordPending||[]).filter(x=>x>now).map(x=>`<div class="order req wait"><span class="oi"><b class="qi">...</b></span><span class="on"><i>чат:</i><span class="rq">печатает...</span></span><span class="dl"></span><span class="or">${mmss(x-now)}</span><span class="st">[...]</span></div>`).join('')}
 const QHINT={merge:'Сделай слияния подряд: на всё 1 минута, таймер стартует с первого',spawn:'Жми НАЙТИ, чтобы получить новые артефакты',event:'Запусти событие из баннера СОБЫТИЕ',shelf:'Открой Комнату и поставь артефакт на полку'};
 function fulfill(k,cell){const o=S.orders[k];if(!o)return;const kd=OK(o);if(kd==='troll'){banTroll(k);return}if(kd==='sing'||kd==='wheel'){S.orders.splice(k,1);(S.ordPending=S.ordPending||[]).push(Date.now()+ORD_CD);renderOrders();if(kd==='sing'){S.singT=Date.now();startKaraoke(o.user)}else{S.wheelDay=today();startWheel(o.user)}save();return}if(kd==='raid'){if(!oReady(o)){toast('Делай слияния, пока рейд не ушёл!');sfx.deny();return}raidWin(k);return}
   if(kd==='give'){if(cell===undefined)cell=hasTier(o.tier);if(cell<0||S.cells[cell]!==o.tier){toast(`Нужен ${NAMES[o.tier]}. Собери его объединением`);sfx.deny();return}}
@@ -1181,8 +1185,8 @@ function clearAround(i){if(S.boss&&nbrs(i,BC,N).includes(S.boss.cell))bossHit(i)
   if(k){const r=refIncome()*20*k;addCoins(r);floatText(cellsEl[i],'FIX +'+fmt(r));toast(k>1?`Восстановлено секторов: ${k}`:'Сектор восстановлен');sfx.coin()}}
 function genTick(){S.cells.forEach((t,i)=>{if(t!==GEN)return;const near=nbrs(i,BC,N).filter(j=>S.cells[j]===null),pool=near.length?near:emptyCells();if(!pool.length)return;
   const j=pool[Math.floor(Math.random()*pool.length)],nt=roll();S.cells[j]=nt;renderCell(j,true);if(nt>S.best)discover(nt,cellsEl[j]);floatText(cellsEl[i],'<<');sfx.spawn()})}
-function virusTick(){if(S.tut<5||S.cells.filter(t=>t===BAD).length>=4)return;const e=emptyCells();if(e.length<6)return;const j=e[Math.floor(Math.random()*e.length)];S.cells[j]=BAD;renderCell(j,true);
-  toast('Вирус повредил сектор!');sfx.deny();cutin('ЧТО?!','вирус в секторе','shock');moodBump(-6);buddy('virus',null,true);chat('event',3)}
+function virusTick(){if(S.tut<5||S.cells.filter(t=>t===BAD).length>=6)return;const e=emptyCells();if(e.length<4)return;const sp=[];S.cells.forEach((t,i)=>{if(t===BAD)nbrs(i,BC,N).forEach(j=>{if(S.cells[j]===null)sp.push(j)})});const spread=sp.length&&Math.random()<.5;const j=spread?pick(sp):e[Math.floor(Math.random()*e.length)];S.cells[j]=BAD;renderCell(j,true);
+  toast(spread?'Вирус расползается! Каждый битый сектор −4% дохода':'Вирус повредил сектор! Каждый битый сектор −4% дохода');sfx.deny();cutin('ЧТО?!','вирус в секторе','shock');moodBump(-6);buddy('virus',null,true);chat('event',3)}
 function bigFx(t,force){if(REDUCED||(!force&&t<6))return;const tm=document.querySelector('.term');tm.classList.remove('rgb');void tm.offsetWidth;tm.classList.add('rgb');setTimeout(()=>tm.classList.remove('rgb'),500);
   const b=document.createElement('div');b.className='bloom';document.body.appendChild(b);setTimeout(()=>b.remove(),650);if(t>=9)shake()}
 
@@ -1469,7 +1473,7 @@ const LINES={
 const MOOD_UP={idle:'Уже лучше!',uwu:'Мне весело!',party:'Я В УДАРЕ!!'},MOOD_DOWN={sad:'Грустненько...',idle:'Чуть устала...',uwu:'Ну ладно...'};
 let lastAct=Date.now(),boredT=0,hypeCut=0;
 document.addEventListener('pointerdown',()=>{lastAct=Date.now()},true);
-const idlePen=()=>th('marathon')?-10:Math.max(0,Math.min(25,(Date.now()-lastAct-45000)/60000*25));
+const idlePen=()=>th('marathon')?-10:Math.max(0,Math.min(35,(Date.now()-lastAct-30000)/60000*30));
 const MOOD={welcome:'uwu',idle:'idle',merge:'owo',newItem:'wow',order:'cool',full:'angry',boost:'party',chest:'love',event:'wow',poke:'nya',spam:'uwu',anime:'uwu',virus:'angry'};
 const pick=a=>a[Math.floor(Math.random()*a.length)];
 const smiles=n=>Array.from({length:n},()=>pick(SMILES)).join(' ');
@@ -1600,21 +1604,24 @@ function startRaid(){const who=pick(RAIDERS),n=Math.round(viewers*(1+Math.random
 function raidWin(k){const o=S.orders[k];S.orders.splice(k,1);addCoins(o.reward);addSubs(Math.max(10,Math.round(o.raiders*.08)));moodBump(12);S.stats.raids=(S.stats.raids||0)+1;
   const card=$('orders').children[k];if(card){burstAt(card,26);floatText(card,'+'+fmt(o.reward))}sfx.fanfare();cutin('РЕЙД ДОВОЛЕН!',`+${fmtInt(Math.max(10,Math.round(o.raiders*.08)))} подписчиков`,'neko');
   logChat(o.user,'остаёмся! подписались!','me');renderOrders();save()}
-function startTroll(){const who=pick(TROLLS);S.orders.unshift({kind:'troll',user:who,text:pick(TROLL_TXT),until:Date.now()+15000,reward:Math.round(refIncome()*30)});renderOrders();
+function startTroll(){const who=pick(TROLLS);S.orders.unshift({kind:'troll',user:who,text:pick(TROLL_TXT),until:Date.now()+12000,reward:Math.round(refIncome()*30)});renderOrders();
   for(let i=0;i<4;i++)setTimeout(()=>chatSpawn(pick(TROLL_TXT),true,who),i*500);setFace('angry',false,true);
   typeLine('Тролль в чате! Тыкни меня или БАН! '+smiles(1),'angry',true);sfx.deny()}
 function banTroll(k){const o=S.orders[k];if(!o||o.kind!=='troll')return;S.orders.splice(k,1);addCoins(o.reward);moodBump(5);S.stats.bans=(S.stats.bans||0)+1;
   const card=$('orders').children[k];if(card){burstAt(card,20);floatText(card,'БАН!')}sfx.coin();shake();
   typeLine(`${o.user} забанен! `+smiles(1),'cool',true);spamFrom($('bface'),3);
   for(let i=0;i<3;i++)setTimeout(()=>logChat(pick(REQ_NAMES),pick(['кот-модератор топ','БАН!!!','так ему','спасибо, кот','F тролль']),'me'),300+i*400);renderOrders();save()}
+function missOrder(o){viewers*=.93;moodBump(-6);S.stats.missed=(S.stats.missed||0)+1;(S.ordPending=S.ordPending||[]).push(Date.now()+ORD_CD);
+  logChat(o.user||'viewer',pick(['ну и ладно, пока','не дождался...','скучно, ушёл','игнор? понятно']),'hot');toast(`${o.user||'Зритель'} не дождался и ушёл: зрители −7%`);sfx.deny();save()}
 function trollHit(o){const e=emptyCells();let what='';
-  if(e.length&&Math.random()<.6){const i=pick(e);S.cells[i]=BAD;renderCell(i,true);what='сломал клетку'}else{const st=Math.min(S.coins*.05,refIncome()*60);S.coins-=st;what=`украл ◈${fmt(st)}`}
-  moodBump(-10);toast(`${o.user} ${what}. Бань быстрее!`);logChat(o.user,'ахаха, лох','hot');sfx.deny();shake()}
+  const st=Math.min(S.coins*.08,refIncome()*90);S.coins-=st;what=`украл ◈${fmt(st)}`;if(e.length&&Math.random()<.7){const i=pick(e);S.cells[i]=BAD;renderCell(i,true);what+=' и сломал клетку'}
+  viewers*=.95;moodBump(-12);toast(`${o.user} ${what}. Бань быстрее!`);logChat(o.user,'ахаха, лох','hot');sfx.deny();shake()}
 setInterval(()=>{if(!streamOn||S.tut<5||E||rlActive||document.hidden)return;const now=Date.now();
   let ch=false;for(let k=S.orders.length-1;k>=0;k--){const o=S.orders[k];
+    if(hasLeft(o)&&overlay.hidden&&!tourOn){if(o.left==null)o.left=PATIENCE();o.left-=th('chill')?500:1000;if(o.left<=0){S.orders.splice(k,1);missOrder(o);ch=true;continue}}
     if(o.kind==='troll'&&o.until<=now){S.orders.splice(k,1);trollHit(o);ch=true}
-    else if(o.kind==='raid'&&o.until<=now&&o.n<o.need){S.orders.splice(k,1);logChat(o.user,pick(['скучно, уходим','ну и ладно','пока!']),'hot');viewers*=.85;moodBump(-6);toast('Рейд ушёл, не дождавшись');ch=true}}
-  if(ch)renderOrders();
+    else if(o.kind==='raid'&&o.until<=now&&o.n<o.need){S.orders.splice(k,1);logChat(o.user,pick(['скучно, уходим','ну и ладно','пока!']),'hot');viewers*=.8;moodBump(-10);toast('Рейд ушёл, не дождавшись: зрители −20%');ch=true}}
+  if(ch){renderOrders();ensureOrders()}
   if(th('chill')||!overlay.hidden||now<streamEvT||S.orders.some(o=>o.kind==='raid'||o.kind==='troll'))return;
   streamEvT=now+(6+Math.random()*8)*60000;if(S.best<3)return;
   if(Math.random()<.55)startRaid();else startTroll()},1000);
@@ -1659,7 +1666,7 @@ function renderMood(){const m=S.mood==null?55:S.mood,k=Math.round(m/20),lv=moodL
     if(S.buddy&&S.tut>=5){const t=(up?MOOD_UP:MOOD_DOWN)[lv.face];if(t){budLast=Date.now();typeLine(t+' '+smiles(1),lv.face);spamFrom($('avatar'),up?4:1)}}else if(!$('bface').classList.contains('talk'))setFace(lv.face);
     if(up&&lv.face==='party'&&Date.now()-hypeCut>300000){hypeCut=Date.now();cutin('В УДАРЕ!!','настроение на максимуме','eyes');chat('combo',4)}
     if(!up&&lv.face==='sad')for(let i=0;i<3;i++)setTimeout(()=>logChat(pick(REQ_NAMES),pick(CHAT.sad)),600+i*700)}moodShownLv=lv.name}
-function tickViewers(){const mt=Math.max(0,Math.min(100,15+18*Math.log10(Math.max(10,viewers||10))+wb('mood')-idlePen()));S.mood=(S.mood==null?55:S.mood)+(mt-(S.mood==null?55:S.mood))*.03;renderMood();const t=viewersTarget();if(!viewers)viewers=t;viewers+=(t-viewers)*.15+(Math.random()-.5)*Math.max(8,t*.05);viewers=Math.max(40,viewers);
+function tickViewers(){const mt=Math.max(0,Math.min(100,15+18*Math.log10(Math.max(10,viewers||10))+wb('mood')-idlePen()-6*S.orders.filter(o=>hasLeft(o)&&o.left!=null&&o.left<60000).length));S.mood=(S.mood==null?55:S.mood)+(mt-(S.mood==null?55:S.mood))*.03;renderMood();const t=viewersTarget();if(!viewers)viewers=t;viewers+=(t-viewers)*.15+(Math.random()-.5)*Math.max(8,t*.05);viewers=Math.max(40,viewers);
   viewersShown+=(viewers-viewersShown)*(viewersShown?.35:1);$('liveTtl').textContent=`ОНЛАЙН · ${fmtInt(viewersShown)}`}
 setInterval(tickViewers,1500);
 const SC_NAMES=['xXx_Lera_xXx','Kiber_Tim','~*Ksu*~','NeoHacker','dj_Vasya','Glitter_Girl','Millenium99','Flash_Max','Tamago4i','olds_2001','nya_nya','ModemMan'];
@@ -1751,7 +1758,7 @@ function tick(now){const dt=Math.min((now-lastT)/1000,1);lastT=now;
   if(S.conv){convT+=dt;if(convT>=convInterval()){if(spawn(false))convT=0;else convT=convInterval()}$('convBar').style.width=Math.min(100,convT/convInterval()*100)+'%'}
   if(E){E.spawnT+=dt;if(E.spawnT>=EV_SPAWN){E.spawnT=0;evSpawn()}if(Date.now()>=E.end)endEvent();else{evUI(false);const sl=Math.ceil((E.end-Date.now())/1000);if(sl<=10&&sl!==E.lastTick){E.lastTick=sl;sfx.tick()}}}
   S.genT=(S.genT||0)+dt;if(S.genT>=GEN_INT){S.genT=0;genTick()}
-  S.virT=(S.virT||0)+dt;if(S.virT>=150){S.virT=0;virusTick()}
+  S.virT=(S.virT||0)+dt;if(S.virT>=100){S.virT=0;virusTick()}
   if(E&&E.mode==='shrink'){E.shrinkT+=dt;if(E.shrinkT>=25){E.shrinkT=0;const e=[];E.cells.forEach((t,i)=>{if(t===null)e.push(i)});if(e.length){const j=e[Math.floor(Math.random()*e.length)];E.cells[j]=BAD;evRender(j,true);toast('Сектор повреждён! Объединяй рядом');sfx.deny()}}}
   if(S.tut>=5){scNext-=dt;if(scNext<=0){scNext=(70+Math.random()*80)*moodLv().sc;if(overlay.hidden)superchat()}}
   stepFx(dt);drawScope(now);
@@ -1882,8 +1889,8 @@ const RL_RELICS=[
  {id:'reso',name:'Резонанс',art:'~~',desc:'Слияние того же уровня, что и прошлое: очки ×1,5',lock:12},
  {id:'second',name:'Второй шанс',art:'+1',desc:'Один раз за забег спасает от потери последнего сигнала',lock:20},
  {id:'medkit',name:'Аптечка',art:'[+]',desc:'После проклятого эфира и босса +1 сигнал',lock:15}];
-const RL_CURSES={lag:{name:'Лаги',desc:'артефакты падают на 20% чаще'},haters:{name:'Хейтеры',desc:'в эфире каждые 12 с появляется битый сектор'},
- wifi:{name:'Слабый Wi-Fi',desc:'−8 секунд на каждый эфир'},ads:{name:'Реклама',desc:'−15% очков'}};
+const RL_CURSES={lag:{name:'Лаги',desc:'артефакты падают на 25% чаще'},haters:{name:'Хейтеры',desc:'в эфире каждые 9 с появляется битый сектор'},
+ wifi:{name:'Слабый Wi-Fi',desc:'−10 секунд на каждый эфир'},ads:{name:'Реклама',desc:'−20% очков'}};
 const RL_NODE={fight:{n:'Эфир',a:'>_'},elite:{n:'Проклятый эфир',a:'☠'},event:{n:'Событие',a:'?'},shop:{n:'Ларёк',a:'$'},rest:{n:'Отдых',a:'♥'},boss:{n:'Миллениум-баг',a:'BUG'}};
 const RL_PERKS=[{id:'hp',name:'Запасной роутер',desc:'+1 к максимуму сигнала',cost:20,max:2},{id:'coins',name:'Заначка',desc:'Старт с +25 монетами',cost:15,max:2},
  {id:'relic',name:'Счастливый талисман',desc:'Старт со случайным усилением',cost:30,max:1},{id:'reroll',name:'Переиграть',desc:'1 замена вариантов при каждом выборе',cost:25,max:1}];
@@ -1933,12 +1940,12 @@ function rlDamage(n,why){const r=S.run;r.hp-=n;if(r.hp<=0&&rlHas('second')&&r.se
 let RW=null,rwT=0;
 function rlStopWave(){if(rwT){clearInterval(rwT);rwT=0}RW=null}
 function rlWave(t){const r=S.run,fl=r.col+1,cols=rlHas('wide')?6:5,rows=4,boss=t==='boss',elite=t==='elite';
-  let time=boss?60:40;if(rlHas('coffee'))time+=12;if(rlCurse('wifi'))time-=8;
-  const target=Math.round(260*Math.pow(1.42,fl)*(elite?1.6:1));
+  let time=boss?55:40;if(rlHas('coffee'))time+=12;if(rlCurse('wifi'))time-=10;
+  const target=Math.round(300*Math.pow(1.5,fl)*(elite?1.8:1));
   RW={t,cols,rows,cells:Array(cols*rows).fill(null),score:0,target,end:Date.now()+time*1000,time,spawnAt:Date.now()+(rlHas('cold')?6000:900),
-    spInt:Math.max(.7,1.55-fl*.08)*(rlCurse('lag')?.8:1)*(elite?.85:1),combo:0,lastM:0,lastTier:-1,nSpawn:0,hateT:Date.now()+12000,boss:null,bossT:Date.now()+8000,done:false};
+    spInt:Math.max(.62,1.45-fl*.09)*(rlCurse('lag')?.75:1)*(elite?.8:1),combo:0,lastM:0,lastTier:-1,nSpawn:0,hateT:Date.now()+9000,boss:null,bossT:Date.now()+6500,done:false};
   for(let i=0;i<4;i++)rwPlace(0);if(rlHas('pocket'))rwPlace(J);
-  if(boss){const mid=Math.floor(rows/2)*cols+Math.floor(cols/2);RW.cells[mid]=BOSS;RW.boss={i:mid,hp:18+fl*3,max:18+fl*3}}
+  if(boss){const mid=Math.floor(rows/2)*cols+Math.floor(cols/2);RW.cells[mid]=BOSS;RW.boss={i:mid,hp:22+fl*3,max:22+fl*3}}
   rlFrame(`<div class="rlwave"><div class="rlbrd"><div class="board"><div class="grid" id="rlGrid"></div></div></div>
     <div class="rlside"><div class="rlgoal" id="rwGoal"></div><div class="rlbar"><i id="rwBar"></i></div><div class="rltime" id="rwTime"></div><div class="rlcombo" id="rwCombo"></div>
     <p class="dim">${boss?'Бей баг слияниями в соседних клетках. Каждые 8 с он ломает клетку.':'Объединяй одинаковые артефакты. Комбо — слияния подряд без пауз.'} Поле переполнилось — эфир провален.</p></div></div>`,RL_NODE[t].n);
@@ -1961,7 +1968,7 @@ function rwDrop(a,b){if(!RW||RW.done)return;const A=RW.cells[a],B=RW.cells[b];if
   if(rlHas('double')&&Math.random()<.2)res++;res=Math.min(res,MAX);
   RW.cells[b]=res;RW.cells[a]=null;rwRender(a);rwRender(b);const el=$('rlGrid').children[b];
   const now=Date.now(),win=rlHas('combo')?3000:2000;RW.combo=now-RW.lastM<win?RW.combo+1:1;RW.lastM=now;
-  let pts=10*Math.pow(2,res)*Math.min(4,1+(RW.combo-1)*(rlHas('combo')?.4:.25));if(rlHas('reso')&&res-1===RW.lastTier)pts*=1.5;if(rlCurse('ads'))pts*=.85;RW.lastTier=res-1;
+  let pts=10*Math.pow(2,res)*Math.min(4,1+(RW.combo-1)*(rlHas('combo')?.4:.25));if(rlHas('reso')&&res-1===RW.lastTier)pts*=1.5;if(rlCurse('ads'))pts*=.8;RW.lastTier=res-1;
   pts=Math.round(pts);RW.score+=pts;S.run.merges++;if(rlHas('donor'))S.run.coins+=1;
   nbrs(b,RW.cols,RW.cells.length).forEach(j=>{if(RW.cells[j]===BAD){RW.cells[j]=null;rwRender(j)}});
   if(RW.boss&&nbrs(b,RW.cols,RW.cells.length).includes(RW.boss.i)){const d=(res+1)*2+(rlHas('antivir')?2:0);RW.boss.hp=Math.max(0,RW.boss.hp-d);rwRender(RW.boss.i);floatText($('rlGrid').children[RW.boss.i],'-'+d);shake()}
@@ -1973,11 +1980,11 @@ function rwHud(){if(!RW)return;const left=Math.max(0,RW.end-Date.now()),boss=!!R
   $('rwCombo').textContent=RW.combo>1&&Date.now()-RW.lastM<(rlHas('combo')?3000:2000)?`КОМБО ×${RW.combo}`:''}
 function rwTick(){if(!RW||RW.done)return;if(tourOn){RW.end+=100;RW.spawnAt+=100;RW.hateT+=100;RW.bossT+=100;return}const now=Date.now();
   if(now>=RW.spawnAt){RW.nSpawn++;const t=rlHas('nostalgia')&&RW.nSpawn%4===0?1:0;if(!rwPlace(t)){rwFail('Поле переполнилось!');return}RW.spawnAt=now+RW.spInt*1000}
-  if(rlCurse('haters')&&!rlHas('antivir')&&now>RW.hateT){RW.hateT=now+12000;const e=RW.cells.map((x,i)=>x===null?i:-1).filter(i=>i>=0);if(e.length){const i=pick(e);RW.cells[i]=BAD;rwRender(i)}}
-  if(RW.boss&&now>RW.bossT){RW.bossT=now+8000;if(!rlHas('antivir')||Math.random()<.4){const e=nbrs(RW.boss.i,RW.cols,RW.cells.length).filter(i=>RW.cells[i]===null);const all=RW.cells.map((x,i)=>x===null?i:-1).filter(i=>i>=0);const pool=e.length?e:all;if(pool.length){const i=pick(pool);RW.cells[i]=BAD;rwRender(i);sfx.deny()}}}
+  if(rlCurse('haters')&&!rlHas('antivir')&&now>RW.hateT){RW.hateT=now+9000;const e=RW.cells.map((x,i)=>x===null?i:-1).filter(i=>i>=0);if(e.length){const i=pick(e);RW.cells[i]=BAD;rwRender(i)}}
+  if(RW.boss&&now>RW.bossT){RW.bossT=now+6500;if(!rlHas('antivir')||Math.random()<.4){const e=nbrs(RW.boss.i,RW.cols,RW.cells.length).filter(i=>RW.cells[i]===null);const all=RW.cells.map((x,i)=>x===null?i:-1).filter(i=>i>=0);const pool=e.length?e:all;if(pool.length){const i=pick(pool);RW.cells[i]=BAD;rwRender(i);sfx.deny()}}}
   if(now>=RW.end){rwFail('Время вышло');return}rwHud()}
 function rwCheck(){if(!RW||RW.done)return;if(RW.boss?RW.boss.hp<=0:RW.score>=RW.target)rwWin()}
-function rwWin(){const t=RW.t,r=S.run;RW.done=true;rlStopWave();const fl=r.col+1;let c=12+fl*3+(t==='elite'?20:0);if(rlHas('greed'))c=Math.round(c*1.6);r.coins+=c;
+function rwWin(){const t=RW.t,r=S.run;RW.done=true;rlStopWave();const fl=r.col+1;let c=8+fl*3+(t==='elite'?16:0);if(rlHas('greed'))c=Math.round(c*1.6);r.coins+=c;
   sfx.fanfare();cutin(t==='boss'?'БАГ ПОВЕРЖЕН!!':'ЭФИР ПРОЙДЕН!',`+${c} монет`,'neko');
   if((t==='elite'||t==='boss')&&rlHas('medkit'))r.hp=Math.min(r.max,r.hp+1);
   if(t==='boss'){rlEnd(true);return}save();rlPickRelic(t==='elite'?'Редкая награда за проклятый эфир':'Награда за эфир',()=>rlNext())}
@@ -1989,16 +1996,16 @@ function rlPickRelic(title,then){const r=S.run;let rr=rlMeta().perks.reroll?1:0;
   const draw=()=>{const pool=rlPool().filter(x=>!r.relics.includes(x.id));const opts=[];while(opts.length<3&&pool.length)opts.push(pool.splice(rlRand(pool.length),1)[0]);return opts};
   let opts=draw();
   const show=()=>{rlFrame(`<div class="rlhome"><h2>${title}</h2><p>Выбери одно усиление на весь забег.</p><div class="rlcards">${opts.map(o=>`<button class="rlcard" data-id="${o.id}"><b>${o.art}</b><strong>${o.name}</strong><span>${o.desc}</span></button>`).join('')||'<p>Все усиления уже собраны!</p>'}</div>
-    <div class="btns">${rr?'<button class="btn" id="rlRe">Переиграть варианты</button>':''}<button class="btn" id="rlSkip">Пропустить (+10 монет)</button></div></div>`,'награда');
+    <div class="btns">${rr?'<button class="btn" id="rlRe">Переиграть варианты</button>':''}<button class="btn" id="rlSkip">Пропустить (+5 монет)</button></div></div>`,'награда');
     $('rl').querySelectorAll('.rlcard').forEach(b=>b.onclick=()=>{const id=b.dataset.id;r.relics.push(id);if(id==='greed'){r.max=Math.max(1,r.max-1);r.hp=Math.min(r.hp,r.max)}sfx.chest();save();then()});
-    $('rlSkip').onclick=()=>{r.coins+=10;save();then()};if(rr)$('rlRe').onclick=()=>{rr=0;opts=draw();show()}};show()}
+    $('rlSkip').onclick=()=>{r.coins+=5;save();then()};if(rr)$('rlRe').onclick=()=>{rr=0;opts=draw();show()}};show()}
 /* ---------- события ---------- */
 const RL_EVENTS=[
  {t:'Подозрительная флешка',d:'Под столом нашлась флешка без подписи. Вставить в компьютер прямо в эфире?',o:[
    {l:'Вставить',f:()=>Math.random()<.5?rlGiveRelic('На флешке нашлось усиление!'):(rlDamage(1,'Вирус! −1 сигнал')||rlInfo('Флешка оказалась с вирусом. Сигнал −1.'))},
    {l:'Выкинуть',f:()=>rlInfo('Флешка отправилась в мусорку. Ничего не случилось.')}]},
  {t:'Спонсор',d:'Магазин модемов предлагает рекламный контракт до конца марафона.',o:[
-   {l:'Подписать (+60 монет, проклятие «Реклама»)',f:()=>{S.run.coins+=60;rlAddCurse('ads');rlInfo('Контракт подписан: +60 монет. Очки в эфирах −15%.')}},
+   {l:'Подписать (+60 монет, проклятие «Реклама»)',f:()=>{S.run.coins+=60;rlAddCurse('ads');rlInfo('Контракт подписан: +60 монет. Очки в эфирах −20%.')}},
    {l:'Отказаться',f:()=>rlInfo('Чат уважает: без рекламы честнее.')}]},
  {t:'Ночной зритель',d:'В 4 утра в чате остался один зритель. Он пишет: «не спится?»',o:[
    {l:'Поболтать (+1 сигнал)',f:()=>{S.run.hp=Math.min(S.run.max,S.run.hp+1);rlInfo('Душевный разговор. Сигнал +1.')}},
@@ -2019,14 +2026,14 @@ function rlGiveRelic(text){const pool=rlPool().filter(x=>!S.run.relics.includes(
 function rlEvent(){const e=pick(RL_EVENTS);rlFrame(`<div class="rlhome"><h2>${e.t}</h2><p>${e.d}</p><div class="rlopts">${e.o.map((o,i)=>`<button class="btn" data-o="${i}" ${o.ok&&!o.ok()?'disabled':''}>${o.l}</button>`).join('')}</div></div>`,'событие');
   $('rl').querySelectorAll('[data-o]').forEach(b=>b.onclick=()=>e.o[+b.dataset.o].f())}
 /* ---------- ларёк и отдых ---------- */
-function rlShop(){const r=S.run;const pool=rlPool().filter(x=>!r.relics.includes(x.id));const items=[];while(items.length<3&&pool.length){const x=pool.splice(rlRand(pool.length),1)[0];items.push({x,p:40+rlRand(4)*10})}
+function rlShop(){const r=S.run;const pool=rlPool().filter(x=>!r.relics.includes(x.id));const items=[];while(items.length<3&&pool.length){const x=pool.splice(rlRand(pool.length),1)[0];items.push({x,p:50+rlRand(4)*10})}
   const render=()=>{rlFrame(`<div class="rlhome"><h2>Ночной ларёк</h2><p>Монеты забега: <b>◈ ${r.coins}</b></p><div class="rlcards">${items.map((it,i)=>`<button class="rlcard" data-b="${i}" ${it.sold||r.coins<it.p?'disabled':''}><b>${it.x.art}</b><strong>${it.x.name}</strong><span>${it.x.desc}</span><em>${it.sold?'КУПЛЕНО':'◈ '+it.p}</em></button>`).join('')}</div>
-    <div class="rlopts"><button class="btn" id="rlHeal" ${r.coins<25||r.hp>=r.max?'disabled':''}>Энергетик: +1 сигнал · ◈ 25</button><button class="btn" id="rlUncurse" ${r.coins<50||!r.curses.length?'disabled':''}>Снять проклятие · ◈ 50</button><button class="btn pink" id="rlOk">Уйти</button></div></div>`,'ларёк');
+    <div class="rlopts"><button class="btn" id="rlHeal" ${r.coins<35||r.hp>=r.max?'disabled':''}>Энергетик: +1 сигнал · ◈ 35</button><button class="btn" id="rlUncurse" ${r.coins<60||!r.curses.length?'disabled':''}>Снять проклятие · ◈ 60</button><button class="btn pink" id="rlOk">Уйти</button></div></div>`,'ларёк');
     $('rl').querySelectorAll('[data-b]').forEach(b=>b.onclick=()=>{const it=items[+b.dataset.b];if(it.sold||r.coins<it.p)return;r.coins-=it.p;it.sold=1;r.relics.push(it.x.id);if(it.x.id==='greed'){r.max=Math.max(1,r.max-1);r.hp=Math.min(r.hp,r.max)}sfx.coin();save();render()});
-    $('rlHeal').onclick=()=>{r.coins-=25;r.hp=Math.min(r.max,r.hp+1);sfx.coin();save();render()};$('rlUncurse').onclick=()=>{r.coins-=50;r.curses.shift();sfx.coin();save();render()};$('rlOk').onclick=rlNext};render()}
+    $('rlHeal').onclick=()=>{r.coins-=35;r.hp=Math.min(r.max,r.hp+1);sfx.coin();save();render()};$('rlUncurse').onclick=()=>{r.coins-=60;r.curses.shift();sfx.coin();save();render()};$('rlOk').onclick=rlNext};render()}
 function rlRest(){const r=S.run;rlFrame(`<div class="rlhome"><pre class="ascii">  (  )   ( )\n   )(  zZ  )(\n  [____]  [__]</pre><h2>Перерыв на чай</h2><p>Стримерша ушла на кухню. Чат ждёт.</p>
-  <div class="rlopts"><button class="btn" id="rlA" ${r.hp>=r.max?'disabled':''}>Отдохнуть: +2 сигнала</button><button class="btn" id="rlB">Апгрейд роутера: +1 к максимуму</button></div></div>`,'отдых');
-  $('rlA').onclick=()=>{r.hp=Math.min(r.max,r.hp+2);sfx.chest();rlNext()};$('rlB').onclick=()=>{r.max++;sfx.chest();rlNext()}}
+  <div class="rlopts"><button class="btn" id="rlA" ${r.hp>=r.max?'disabled':''}>Отдохнуть: +1 сигнал</button><button class="btn" id="rlB">Апгрейд роутера: +1 к максимуму</button></div></div>`,'отдых');
+  $('rlA').onclick=()=>{r.hp=Math.min(r.max,r.hp+1);sfx.chest();rlNext()};$('rlB').onclick=()=>{r.max++;sfx.chest();rlNext()}}
 /* ---------- конец забега и архив ---------- */
 function rlEnd(win){const r=S.run,m=rlMeta(),fl=win?8:r.cleared;const tapes=fl*2+(win?15:0)+Math.floor(r.merges/25);m.tapes+=tapes;m.best=Math.max(m.best,fl);if(win)m.wins++;
   const coins=Math.round(refIncome()*(40*fl+(win?300:0))),subs=fl*6+(win?80:0);addCoins(coins);addSubs(subs);moodBump(win?20:5);S.run=null;save();
@@ -2050,7 +2057,7 @@ const TOUR_MAIN=[
  {el:()=>[$('goalLine')],t:'Сбор чата',d:'Суперчаты от зрителей наполняют эту полоску. Когда сбор закрыт, чат покупает технику для стрима с постоянным бонусом, и она появляется на камере.'},
  {el:()=>[$('moodBox')],t:'Настроение',d:'Сердечки — настроение. Весёлая стримерша приносит до +30% дохода, грустная −15%. Растёт от онлайна и игры, падает, если долго ничего не делать.'},
  {el:()=>[$('bface')?.closest('.buddy')],t:'Кот-помощник',d:'Кот подсказывает, что делать дальше. Нажми на кота, чтобы забанить тролля в чате. Ещё его можно отправить на барахолку за находками.'},
- {el:()=>[document.querySelector('.chatp')],t:'Чат и просьбы',d:'Зрители просят артефакты и дают задания. Перетащи нужный артефакт на просьбу или нажми «ОТДАТЬ», когда она подсветится. Награда — монеты и подписчики.'},
+ {el:()=>[document.querySelector('.chatp')],t:'Чат и просьбы',d:'Зрители просят артефакты и дают задания. Перетащи нужный артефакт на просьбу или нажми «ОТДАТЬ», когда она подсветится. Награда — монеты и подписчики. У каждой просьбы есть таймер: не успеешь — зритель уйдёт, а настроение упадёт.'},
  {el:()=>[document.querySelector('.boardp')],t:'Хранилище',d:'Главное поле. Перетащи артефакт на такой же — получится следующий, ценнее. Каждый артефакт на поле приносит монеты каждую секунду. В заголовке видно, какой артефакт следующий.'},
  {el:()=>[document.querySelector('.lcdbox')],t:'Ресурсы',d:'Монеты и доход в секунду. Ниже — подписчики: когда набираешь цель, канал получает новый уровень и открываются вещи в Образе.'},
  {el:()=>[$('evBanner')],t:'Событие',d:'Раз в 12 часов открывается мини-событие: гонка за очками на отдельном поле с крупными наградами.'},
