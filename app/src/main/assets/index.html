@@ -136,11 +136,15 @@ button:focus-visible{outline:1px dashed var(--ph-hi);outline-offset:2px}
 #fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:65}
 
 /* retro-OS windows inside the terminal */
-.overlay{position:absolute;inset:0;z-index:8;display:grid;place-items:center;padding:10px;background:rgba(0,0,0,.72)}
+.overlay{position:absolute;inset:0;z-index:8;display:flex;align-items:center;justify-content:center;padding:10px 10px 34px;box-sizing:border-box;background:rgba(0,0,0,.72)}
 .sheet{width:100%;max-height:100%;display:flex;flex-direction:column;border:1px solid var(--ph);background:var(--bg2);box-shadow:0 0 0 3px var(--bg),0 0 0 4px var(--ph-dim),0 0 24px var(--phg)}
 .whead{flex:none;display:flex;justify-content:space-between;gap:8px;padding:3px 6px;background:var(--ph);color:var(--bg);text-shadow:none;font-size:.64rem;font-weight:700}
 .whead span:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sheet .body{overflow-y:auto;padding:12px 10px;display:flex;flex-direction:column;gap:10px}
+.sheet .body{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y;padding:12px 10px;display:flex;flex-direction:column;gap:10px}
+.sheet .body>*{flex:none}
+.sheet .body{scrollbar-width:thin;scrollbar-color:var(--ph) transparent}
+.sheet .body::-webkit-scrollbar{width:8px}.sheet .body::-webkit-scrollbar-thumb{background:var(--ph)}
+.whead span:last-child{cursor:pointer;padding:0 2px}
 .sheet h2{margin:0;font-size:.86rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ph-hi)}
 .sheet h2::before{content:"## "}
 .sheet h3{margin:4px 0 0;font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:var(--ph-mid)}
@@ -1268,7 +1272,7 @@ $('evBanner').onclick=evIntro;
 
 /* ---------- sheets (glossy windows) ---------- */
 const overlay=$('overlay'),sheet=$('sheet');let queue=[];
-function openSheet(html,file){sheet.innerHTML=`<div class="whead"><span>${file||'alert'}</span><span>[_][□][X]</span></div><div class="body">${html}</div>`;overlay.hidden=false}
+function openSheet(html,file){setTimeout(()=>{const x=sheet.querySelector('.whead span:last-child');if(x)x.onclick=()=>closeSheet();const b=sheet.querySelector('.body');if(b)b.scrollTop=0},0);sheet.innerHTML=`<div class="whead"><span>${file||'alert'}</span><span>[_][□][X]</span></div><div class="body">${html}</div>`;overlay.hidden=false}
 function closeSheet(){overlay.hidden=true;sheet.innerHTML='';const next=queue.shift();if(next)setTimeout(()=>{if(overlay.hidden)next();else queue.unshift(next)},150)}
 
 function showAd(onDone){let n=0;const T=12;
