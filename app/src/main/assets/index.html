@@ -704,6 +704,9 @@ html.vert[data-ph] .big .c{font-size:.7rem}
 html.vert[data-ph] .keys{gap:5px}
 html.vert[data-ph] .k{display:flex;flex-direction:column;justify-content:center;padding:4px 4px 6px;font-size:.52rem}
 html.vert[data-ph] .k .m,html.vert[data-ph] .k .d{display:none}
+
+.whead{align-items:center}.whead span:last-child{flex:none;min-width:28px;text-align:center;padding:1px 8px!important;margin:-2px -4px -2px 0;background:#d4d0c8;color:#000;border:2px solid;border-color:#fff #404040 #404040 #fff;font-weight:700}
+.whead span:last-child:active{border-color:#404040 #fff #fff #404040}
 </style>
 <script>/* мост к Android: вибрация через нативный API */
 if(window.AndroidApp){navigator.vibrate=function(p){try{AndroidApp.vibrate(JSON.stringify(Array.isArray(p)?p:[p]))}catch(e){}return true}}</script>
@@ -1241,7 +1244,7 @@ function openCard(t){if(t===null||t===undefined)return;
   openSheet(`<div class="cardpic">${gemSVG(t)}</div><h2>${nameOf(t)}</h2>
   <dl>${sp?`<dt>Тип</dt><dd>Особый предмет</dd>`:`<dt>Уровень</dt><dd>${t+1} из ${MAX+1}</dd><dt>Доход</dt><dd>${fmt(income(t)*mult())}/с</dd><dt>Следующий</dt><dd>${t<MAX?NAMES[t+1]:'—'}</dd><dt>Набор</dt><dd>${st?st.name+((S.room||[]).includes(t)?' [на полке]':''):'—'}</dd>`}</dl>
   <p class="flavor">${sp?SPECIAL_DESC[t]:FLAVOR[t]}</p>
-  <div class="btns"><button class="btn pink" id="cardOk">Закрыть</button></div>`,'item.nfo');$('cardOk').onclick=closeSheet;sfx.key('0')}
+  `,'item.nfo');sfx.key('0')}
 
 /* ---------- Комната 2000-х: shelves with permanent set bonuses ---------- */
 function roomReady(){return SETS.some(st=>st.items.some(t=>!(S.room||[]).includes(t)&&hasTier(t)>=0))}
@@ -1256,8 +1259,7 @@ function showRoom(){const shelves=SETS.map(st=>{const got=st.items.filter(t=>S.r
   const body=roomTab==='furn'?`<p>Мебель видна за стримершей на камере и даёт небольшие бонусы. Технику для стрима покупает чат: суперчаты идут в сбор.</p><pre class="ascii">${camRoomArt().replace(/</g,'&lt;')}</pre><h3>Мебель</h3><div class="slist">${furnRows}</div><h3>Сборы чата</h3><div class="slist">${goalRows}</div>`
     :`<p>Ставь артефакты с поля на полки. Полный набор даёт постоянный бонус, который сохраняется даже после Перезагрузки.</p>${shelves}`;
   openSheet(`<pre class="ascii">${ART.room}</pre><h2>Комната 2000-х</h2>${tabs}${body}
-  <div class="btns"><button class="btn pink" id="roomOk">Закрыть</button></div>`,'room.exe');
-  $('roomOk').onclick=closeSheet;
+  `,'room.exe');
   sheet.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{roomTab=b.dataset.tab;showRoom()});
   sheet.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{const f=FURN.find(x=>x.id===b.dataset.f);if(!f||S.coins<f.cost)return;S.coins-=f.cost;furn().push(f.id);sfx.chest();toast(`${f.name} в комнате: ${bonusText(f.b)}`);renderCamRoom();moodBump(4);typeLine(pick(['Красиво!','Уютно стало!','Чат, оцените!'])+' '+smiles(1),'love');save();showRoom()});
   sheet.querySelectorAll('.slot.can').forEach(b=>b.onclick=()=>{const t=+b.dataset.t,i=hasTier(t);if(i<0)return;S.cells[i]=null;renderCell(i);S.room.push(t);
@@ -1421,8 +1423,8 @@ function showDaily(){const cur=S.daily.n%7,ready=dailyReady();
     return`<div class="day px ${cls}${d===6?' chest':''}"><span class="dn">День ${d+1}</span><span class="dr">${d===6?'Сундук + '+fmt(dailyCoins(d)):fmt(dailyCoins(d))}</span></div>`}).join('');
   openSheet(`<h2>Подарки каждый день</h2><pre class="ascii">${ART.gift}</pre><p>Заходи каждый день. Пропуск не сбрасывает прогресс. На 4-й день к монетам прилагается Флешка-джокер, на 7-й ждёт сундук.</p><div class="days">${days}</div>
   ${ready?`<div class="btns"><button class="btn gel" id="dClaim">Забрать</button><button class="btn gel lime" id="dClaim2">×2 за ролик</button></div>`
-  :`<p>Сегодняшний подарок получен. Завтра откроется день ${(S.daily.n%7)+1}.</p><div class="btns"><button class="btn gel pink" id="dClose">Понятно</button></div>`}`,'gifts.exe');
-  if(!ready){$('dClose').onclick=closeSheet;return}
+  :`<p>Сегодняшний подарок получен. Завтра откроется день ${(S.daily.n%7)+1}.</p>`}`,'gifts.exe');
+  if(!ready)return;
   const claim=k=>{const d=S.daily.n%7,c=dailyCoins(d)*k;addCoins(c);S.daily.n++;S.daily.last=today();S.stats.dailies++;toast(`День ${d+1}: +${fmt(c)}`);sfx.coin();moodBump(5);if(d===3&&S.cells.filter(t=>t===J).length<2&&place(J))setTimeout(()=>toast('Бонус дня: Флешка-джокер!'),1200);if(d===6)openChest('Сундук седьмого дня');updateDots();save()};
   $('dClaim').onclick=()=>{closeSheet();claim(1)};
   $('dClaim2').onclick=()=>showAd(()=>claim(2))}
@@ -1745,8 +1747,8 @@ function shopBuy(id){const it=SHOP.find(x=>x.id===id),p=shopPrice(it),why=shopWh
 function showShop(){const rows=SHOP.map(it=>{const p=shopPrice(it),why=shopWhy(it);
     return`<div class="sitem"><pre>${it.art.replace(/</g,'&lt;')}</pre><div><b>${it.name}</b><span>${why?'<i>'+why+'</i>':it.desc}</span></div><button class="btn wbtn" data-s="${it.id}" ${why||S.coins<p?'disabled':''}>◈ ${fmt(p)}</button></div>`}).join('');
   openSheet(`<h2>Ларёк у метро</h2><p>Цены растут вместе с доходом: каждый товар стоит несколько минут заработка. Баланс: <b>◈ ${fmt(S.coins)}</b></p><div class="slist">${rows}</div>
-  <div class="btns"><button class="btn pink" id="shOk">Закрыть</button></div>`,'shop.exe');
-  $('shOk').onclick=closeSheet;sheet.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>shopBuy(b.dataset.s))}
+  `,'shop.exe');
+  sheet.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>shopBuy(b.dataset.s))}
 $('shopBtn').onclick=showShop;
 function wardReady(){return WARD.some(it=>!ward().owned.includes(it.id)&&chanLvl()>=it.lvl&&S.coins>=it.cost)}
 function showWardrobe(){const w=ward(),lv=moodLv();
@@ -1757,8 +1759,7 @@ function showWardrobe(){const w=ward(),lv=moodLv();
   openSheet(`<h2>Гардероб</h2><div class="wprev"><pre>${avatarArt(lv.face,false).replace(/</g,'&lt;')}</pre><pre class="wcat">${catArt('idle',false).replace(/</g,'&lt;')}</pre></div>
   <p>Уровень канала ${chanLvl()}: новые вещи открываются с ростом подписчиков. Надетые вещи дают бонусы.</p>
   <h3>Стримерша</h3><div class="wlist">${sect('g')}</div><h3>Кот-помощник</h3><div class="wlist">${sect('c')}</div>
-  <div class="btns"><button class="btn pink" id="wOk">Готово</button></div>`,'wardrobe.exe');
-  $('wOk').onclick=closeSheet;
+  `,'wardrobe.exe');
   sheet.querySelectorAll('[data-w]').forEach(b=>b.onclick=()=>{const it=WARD.find(x=>x.id===b.dataset.id);if(!it)return;
     if(b.dataset.w==='buy'){if(S.coins<it.cost)return;S.coins-=it.cost;w.owned.push(it.id);w.eq[it.slot]=it.id;sfx.chest();toast(`${it.name}: ${bonusText(it.b)}`);moodBump(3);chat('chest',3)}
     else if(b.dataset.w==='wear'){w.eq[it.slot]=it.id;sfx.key('1')}
@@ -1864,8 +1865,7 @@ function showSched(){const c=sch(),st=schedStreak();
   <p>Выбери время эфира. Заходи в окно <b>с ${'{a}'} до ${'{b}'}</b>: зрители ждут, онлайн ×${schedMult().toFixed(1)} на 10 минут, бонус подписчиков и настроения. Каждый день подряд усиливает бонус, каждые 7 дней дают сундук.</p>
   <p>Серия: <b>${st} дн.</b> · Следующий эфир: <b>${schedLabel()}</b></p>
   <div class="btns sched">${SCHED_H.map(h=>`<button class="btn${c.set&&c.h===h?' pink':''}" data-h="${h}">${String(h).padStart(2,'0')}:00</button>`).join('')}</div>
-  ${c.set&&st?'<p class="dim">Смена времени сбросит серию.</p>':''}<div class="btns"><button class="btn pink" id="schOk">Готово</button></div>`.replace('{a}',fmtHM(schedWin()[0])).replace('{b}',fmtHM(schedWin()[1])),'sched.exe');
-  $('schOk').onclick=closeSheet;
+  ${c.set&&st?'<p class="dim">Смена времени сбросит серию.</p>':''}`.replace('{a}',fmtHM(schedWin()[0])).replace('{b}',fmtHM(schedWin()[1])),'sched.exe');
   sheet.querySelectorAll('[data-h]').forEach(b=>b.onclick=()=>{const h=+b.dataset.h;if(c.set&&c.h===h)return;if(c.set&&schedStreak())c.streak=0;c.h=h;c.set=true;sfx.coin();toast(`Эфир каждый день в ${String(h).padStart(2,'0')}:00`);schedCheck();save();showSched();if(!$('pc').hidden)renderDesk()})}
 function fmtHM(d){return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')}
 function renderDesk(){$('wall').textContent=asciiFrom(Math.max(0,S.best));
