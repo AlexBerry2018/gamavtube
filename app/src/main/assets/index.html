@@ -334,7 +334,7 @@ html.vert .artbg{display:none!important}
 :root[data-ph="paper"] .toast{background:var(--bg2);border:2px solid var(--ph);box-shadow:4px 4px 0 var(--ph);color:var(--ph-hi)}
 :root[data-ph="paper"] .float{color:var(--red);text-shadow:1px 1px 0 var(--bg2)}
 :root[data-ph="paper"] .dm{color:var(--ph-hi);text-shadow:1px 1px 0 var(--bg2),-1px -1px 0 var(--bg2),1px -1px 0 var(--bg2),-1px 1px 0 var(--bg2)}
-:root[data-ph="paper"] .dm.hot{background:var(--red);color:#fff;box-shadow:2px 2px 0 var(--ph)}
+:root[data-ph="paper"] .dm.hot{background:var(--red);color:#fff;box-shadow:2px 2px 0 var(--ph);text-shadow:-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000,0 1px 0 #000,0 -1px 0 #000,1px 0 0 #000,-1px 0 0 #000;-webkit-text-stroke:0;opacity:1}
 :root[data-ph="paper"] .overlay{background:rgba(243,239,226,.55)}
 :root[data-ph="paper"] .sheet{background:var(--bg2);border:2px solid var(--ph);box-shadow:6px 6px 0 var(--ph)}
 :root[data-ph="paper"] .whead{background:linear-gradient(90deg,#000080,#1084d0);color:#fff}
@@ -673,7 +673,7 @@ ________________________________________________</pre><span class="camrec" aria-
 <script>
 const NAMES=['Стразик','Заколка-бабочка','Кассета','CD-диск','Электропитомец','Пейджер','CD-плеер','Раскладушка','Карманная консоль','MP3-плеер','Аква-компьютер','Ядро 2000','Значок-смайлик','Напульсник в клетку','DVD-диск','USB-флешка','Телефон-слайдер','Цифромыльница','Плеер с колесом','Портативная приставка','Нетбук','Веб-камера','Wi-Fi роутер','Ядро Web 2.0'];
 const HUES=[320,270,30,200,175,195,185,330,280,90,190,300,50,330,45,20,230,345,220,240,215,100,220,180];
-const MAX=NAMES.length-1,N=30,KEY='crystal-mine-v2',OFFLINE_CAP=2*3600*1000,OFFLINE_RATE=0.5;
+const MAX=NAMES.length-1,N=30,KEY='crystal-mine-v2'+(()=>{try{return new URLSearchParams(location.search).get('slot')||''}catch(e){return''}})(),OFFLINE_CAP=2*3600*1000,OFFLINE_RATE=0.5;
 /* economy v2 — tuned with balance_v2.py */
 const CONV_MAX=8,PRESTIGE_TIER=5,DUST_BONUS=0.1,Q_STEP=9,Q0=1000,QG=2.3,SP0=5,SPG=2.3,SPN=1.1,C0=150,CG=5,ORD_K=40,ORD_CD=90000,CHEST_EVERY=6,BASE_MAX=7,BASE_GAP=3,START_K=.25;
 const income=t=>Math.pow(2.6,t);
@@ -1776,6 +1776,30 @@ function pcBoot(waitTap){const pc=$('pc'),pre=$('bootTxt');bootStage=0;bootTimer
     const step=()=>{k++;bar.style.width=Math.min(100,k*10)+'%';$('ltxt').textContent=msgs[Math.min(msgs.length-1,Math.floor(k/3))];if(k<10)T(step,110*sp);else T(toDesk,250*sp)};step()},t+300*sp)}
 $('pc').addEventListener('pointerdown',e=>{if(bootStage===-1){pcBoot();return}if(bootStage<3)toDesk()});
 pcBoot();
+
+/* ---------- K2DBG: управление для тестового стенда (в игре не видно) ---------- */
+window.K2DBG={
+  start(){try{toDesk()}catch(e){}if(!streamOn)launchStream();setTimeout(()=>{for(let i=0;i<5;i++)if(!overlay.hidden)closeSheet()},REDUCED?50:1500);S.tut=5;save()},
+  closeAll(){for(let i=0;i<6;i++)if(!overlay.hidden)closeSheet()},
+  mid(){S.tut=5;S.best=7;S.codex=7;S.coins=Math.max(S.coins,2e5);S.conv=Math.max(S.conv,4);S.subs=Math.max(S.subs||0,700);S.subGoalIx=Math.max(S.subGoalIx||0,3);S.mood=70;
+    S.cells=S.cells.map((x,i)=>x===BAD?null:(i%3===0?null:2+(i*7)%6));shown=Array(N).fill(undefined);renderBoard();ensureOrders();save()},
+  era2(){S.tut=5;S.best=12;S.codex=12;S.cells=S.cells.map((x,i)=>x===BAD?null:(i%2?null:9+(i%4)));shown=Array(N).fill(undefined);renderBoard();ensureOrders();save()},
+  raid(){S.tut=5;if(S.best<3)this.mid();startRaid()},
+  troll(){S.tut=5;startTroll()},
+  boss(){S.tut=5;if(S.best<4)this.mid();if(S.boss)return;startBoss()},
+  sing(){this.closeAll();startKaraoke('tester')},
+  wheel(){this.closeAll();startWheel('tester')},
+  shop(){this.closeAll();showShop()},
+  room(){this.closeAll();roomTab='furn';showRoom()},
+  theme(){this.closeAll();showTheme()},
+  ward(){this.closeAll();showWardrobe()},
+  menu(){this.closeAll();showMenu()},
+  desk(){this.closeAll();showDesk()},
+  recipe(){S.tut=5;const e=emptyCells();if(e.length<2)return;S.best=Math.max(S.best,6);S.cells[e[0]]=2;S.cells[e[1]]=6;renderCell(e[0]);renderCell(e[1]);recipeFound(1,cellsEl[e[1]]);S.cells[e[1]]=REC0+1;S.cells[e[0]]=null;shown[e[0]]=shown[e[1]]=undefined;renderCell(e[0]);renderCell(e[1])},
+  mood(v){S.mood=v;renderMood()},
+  toast(){toast('Тестовое уведомление: так выглядит alert в статус-баре')},
+  reset(){try{localStorage.removeItem(KEY)}catch(e){}location.reload()}
+};
 </script>
 
 </body></html>
