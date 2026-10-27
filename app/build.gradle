@@ -1,0 +1,59 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'ru.kristall2000.game'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "ru.kristall2000.game"
+        minSdk 24
+        targetSdk 34
+        versionCode 1
+        versionName "0.1-test"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.debug   // тестовая подпись, чтобы APK сразу ставился на телефон
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation 'androidx.webkit:webkit:1.11.0'
+}
+
+// Шрифты: при сборке скачиваются с Google Fonts и кладутся внутрь APK (assets/fonts),
+// поэтому на телефоне они есть сразу, даже без интернета.
+def fontsOut = layout.buildDirectory.dir("generated/fonts").get().asFile
+android.sourceSets.main.assets.srcDirs += [fontsOut]
+tasks.register('downloadFonts') {
+    outputs.dir(fontsOut)
+    doLast {
+        def dir = new File(fontsOut, "fonts"); dir.mkdirs()
+        try {
+            def conn = new URL('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=Roboto+Condensed:wght@300;400;700&family=Press+Start+2P&display=swap').openConnection()
+            conn.setRequestProperty('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36')
+            def css = conn.inputStream.getText('UTF-8')
+            int n = 0
+            css = css.replaceAll(/url\((https?:[^)]+)\)/) { all, u ->
+                def name = "f${n++}.woff2"
+                new File(dir, name).bytes = new URL(u).openStream().bytes
+                "url(${name})"
+            }
+            new File(dir, 'fonts.css').setText(css, 'UTF-8')
+            println "Шрифты встроены в APK: ${n} файлов"
+        } catch (Exception e) {
+            println "ВНИМАНИЕ: шрифты не скачались (${e.message}), в APK будут стандартные"
+            new File(dir, 'fonts.css').setText('', 'UTF-8')
+        }
+    }
+}
+tasks.named('preBuild') { dependsOn 'downloadFonts' }
