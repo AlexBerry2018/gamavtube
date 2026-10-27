@@ -580,6 +580,10 @@ html.vert .tright{flex:1 1 auto;min-width:0;flex-wrap:wrap;justify-content:flex-
 .cell.boss .lvl{color:#fff;background:var(--red);font-weight:700;padding:0 3px}
 @keyframes bosspulse{50%{box-shadow:inset 0 0 0 3px rgba(226,36,90,.35)}}
 .bface.back{animation:bob .4s steps(2) infinite;box-shadow:3px 3px 0 var(--red),0 0 0 3px #ffd84a!important}
+@media (max-height:420px){html.land .k{display:flex!important;flex-direction:row;align-items:center;justify-content:space-between;gap:6px;padding:3px 8px}
+ html.land .k .m,html.land .k .d{display:none!important}html.land .k .n{flex:1;min-width:0;line-height:1.3}html.land .k .p{flex:none;line-height:1.3}}
+.alert .et{display:flex;flex-direction:column;align-items:flex-start;gap:1px;white-space:nowrap;line-height:1.25}
+.alert .et .mqw{align-self:stretch;min-width:0;overflow:hidden;font-size:.9em}
 </style>
 <script>/* мост к Android: вибрация через нативный API */
 if(window.AndroidApp){navigator.vibrate=function(p){try{AndroidApp.vibrate(JSON.stringify(Array.isArray(p)?p:[p]))}catch(e){}return true}}</script>
@@ -616,7 +620,7 @@ ________________________________________________</pre><span class="camrec" aria-
         <div class="meta"><span><b id="rate">0</b>/СЕК <span class="spark" id="spark"></span></span><span id="boostPill" class="tag" hidden></span><span id="dustLine" class="tag" hidden></span></div>
         <div class="subs"><span>ПОДП <b id="subs">0</b>/<span id="subGoal">100</span></span><span id="subBar">[..........]</span></div>
       </section>
-      <button class="alert" id="evBanner"><span class="bang">!!</span><span class="et"><span class="mqi"><b>СОБЫТИЕ</b> · <span id="evBannerText">событие</span></span></span><span class="eg" id="evBannerGo">[ЗАПУСК]</span></button>
+      <button class="alert" id="evBanner"><span class="bang">!!</span><span class="et"><b>СОБЫТИЕ</b><span class="mqw"><span class="mqi"><span id="evBannerText">событие</span></span></span></span><span class="eg" id="evBannerGo">[ЗАПУСК]</span></button>
       <div class="ctrls">
         <button class="btn big" id="spawnBtn"><span>&gt; НАЙТИ</span><span class="c">◈ <span id="spawnCost">5</span></span></button>
         <div class="keys">
@@ -1258,7 +1262,7 @@ function endEvent(){const rows=standings(),place=rows.findIndex(r=>r.me)+1,score
   $('evDone').onclick=closeSheet};if(overlay.hidden)show();else queue.unshift(show);if(place<=3)sfx.fanfare();save()}
 
 function updateBanner(){const r=evReady();$('evBanner').classList.toggle('wait',!r);
-  $('evBannerText').textContent=r?`${curMode().name}: гонка за очками`:`${curMode().name} через ${hhmm(S.ev.next-Date.now())}`;{const et=$('evBanner').querySelector('.et'),mi=et.querySelector('.mqi'),dx=et.clientWidth-mi.scrollWidth;et.classList.toggle('mq',dx<-2);et.style.setProperty('--dx',Math.min(0,dx-6)+'px')}
+  $('evBannerText').textContent=r?`${curMode().name}: гонка за очками`:`${curMode().name} через ${hhmm(S.ev.next-Date.now())}`;{const et=$('evBanner').querySelector('.et'),mw=et.querySelector('.mqw'),mi=et.querySelector('.mqi'),dx=mw.clientWidth-mi.scrollWidth;et.classList.toggle('mq',dx<-2);et.style.setProperty('--dx',Math.min(0,dx-6)+'px')}
   $('evBannerGo').textContent=r?'[ЗАПУСК]':'[ЗА РОЛИК]'}
 $('evBanner').onclick=evIntro;
 
