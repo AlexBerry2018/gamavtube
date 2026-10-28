@@ -2283,14 +2283,14 @@ const JBREAK=['K.K.S..K..K.S...','K...S..K.K..S.K.','K.K.S..K..K.S.gS','K..KS.g.
 const JHALF='K.......S.......';
 function mtone(f,t,d,type,vol,att,f2){const a=AC;const o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.setValueAtTime(f,t);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+d);g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(vol,t+(att||.005));g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(MUS.gain);o.start(t);o.stop(t+d+.02)}
 function mnoise(t,d,vol,freq,kind,q){const a=AC;if(!NOISE)return;const src=a.createBufferSource(),f=a.createBiquadFilter(),g=a.createGain();src.buffer=NOISE;f.type=kind||'highpass';f.frequency.value=freq||7000;f.Q.value=q||.7;g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);src.connect(f);f.connect(g);g.connect(MUS.gain);src.start(t,Math.random()*.5);src.stop(t+d+.02)}
-function jKick(t,v){mtone(160,t,.16,'sine',.2*v,.002,42)}
-function jSnare(t,v){mnoise(t,.14,.13*v,1900,'bandpass',.6);mtone(220,t,.07,'triangle',.05*v,.002,160)}
-function jHat(t,v,open){mnoise(t,open?.12:.03,(open?.035:.028)*v,8000)}
-function jReese(f,t,d,v){const a=AC,lp=a.createBiquadFilter(),g=a.createGain();lp.type='lowpass';lp.frequency.setValueAtTime(380,t);lp.frequency.linearRampToValueAtTime(900,t+d*.5);lp.frequency.linearRampToValueAtTime(320,t+d);
-  g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(.05*v,t+.02);g.gain.setValueAtTime(.05*v,t+d*.8);g.gain.exponentialRampToValueAtTime(.0001,t+d);lp.connect(g);g.connect(MUS.gain);
+function jKick(t,v){mtone(140,t,.18,'sine',.15*v,.003,42)}
+function jSnare(t,v){mnoise(t,.12,.075*v,1600,'bandpass',.5);mtone(200,t,.06,'triangle',.03*v,.003,150)}
+function jHat(t,v,open){mnoise(t,open?.1:.025,(open?.02:.016)*v,9000)}
+function jReese(f,t,d,v){const a=AC,lp=a.createBiquadFilter(),g=a.createGain();lp.type='lowpass';lp.frequency.setValueAtTime(300,t);lp.frequency.linearRampToValueAtTime(600,t+d*.5);lp.frequency.linearRampToValueAtTime(320,t+d);
+  g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(.025*v,t+.2);g.gain.setValueAtTime(.025*v,t+d*.8);g.gain.exponentialRampToValueAtTime(.0001,t+d);lp.connect(g);g.connect(MUS.gain);
   [-9,9].forEach(c=>{const o=a.createOscillator();o.type='sawtooth';o.frequency.value=f;o.detune.value=c;o.connect(lp);o.start(t);o.stop(t+d+.02)})}
 function musicTick(){const a=live();if(!a||!MUS.on)return;if(!NOISE)noise(.01,.0001,1000);
-  const hype=Date.now()<MUS.hypeUntil||hy.c>=5&&Date.now()-hy.t<2600||S.orders.some(o=>o.kind==='raid'||o.flash)||!!S.boss,bpm=hype?178:170,st=60/bpm/4;
+  const hype=Date.now()<MUS.hypeUntil||hy.c>=5&&Date.now()-hy.t<2600||S.orders.some(o=>o.kind==='raid'||o.flash)||!!S.boss,bpm=hype?170:164,st=60/bpm/4;
   if(MUS.next<a.currentTime)MUS.next=a.currentTime+.05;
   while(MUS.next<a.currentTime+.3){const t=MUS.next,i=MUS.step%16,bar=Math.floor(MUS.step/16),ci=bar%4,sec=Math.floor(bar/4),ch=JCH[ci];
     if(i===0){MUS.pat=(bar%4===3&&(hype||Math.random()<.4))?JBREAK[4]:(sec%4===0&&!hype&&bar%4<2)?JHALF:JBREAK[Math.floor(Math.random()*4)]}
@@ -2298,18 +2298,16 @@ function musicTick(){const a=live();if(!a||!MUS.on)return;if(!NOISE)noise(.01,.0
     // барабаны: брейк с нарезкой, в хайпе — брейккор-роллы
     if(c==='K')jKick(t,1);
     if(c==='S')jSnare(t,1);else if(c==='g')jSnare(t,.35);
-    if(hype&&Math.random()<.12){const r=st/3;for(let k=1;k<3;k++)jSnare(t+r*k,.5)}
-    if(hype&&i===15&&Math.random()<.5){for(let k=0;k<6;k++)jSnare(t+k*st/6,.3+k*.1)}
+    if(hype&&i===15&&bar%4===3&&Math.random()<.35){for(let k=0;k<4;k++)jSnare(t+k*st/4,.2+k*.08)}
     jHat(t,i%2?.6:1,i===6||i===14);
     // бас: саб на сильные доли, риз в хайпе
-    if(i===0||i===10)mtone(note(JROOT[ci]),t,st*(i===0?5:3),'sine',.13,.008);
+    if(i===0||i===10)mtone(note(JROOT[ci]),t,st*(i===0?6:4),'sine',.12,.02);
     if(hype&&i===0)jReese(note(JROOT[ci]+12),t,st*14,1);
     // атмосферный пэд раз в такт
-    if(i===0)ch.forEach((n,k)=>mtone(note(n),t+k*.012,st*15,'triangle',.012,.25));
-    // пиксельные арпеджио и мелодия
-    if(hype||sec%2===1)mtone(note(ch[i%ch.length]+24),t,st*.6,'square',.01);
-    const ln=JLEAD[ci][i];if(ln&&(sec%2===1||hype)&&bar%8<6)mtone(note(ln),t,st*1.6,'square',.02);
-    if(Math.random()<(hype?.08:.03))mtone(note(96+Math.floor(Math.random()*12)),t,.03,'square',.012);   // пиксельные блипы
+    if(i===0)ch.forEach((n,k)=>mtone(note(n),t+k*.012,st*16,'triangle',.016,.4));
+    // мягкие пиксельные колокольчики вместо мелодии
+    if((hype||sec%2===1)&&i%2===0)mtone(note(ch[(i/2)%ch.length]+24),t,st*2.5,'sine',.012,.004);
+    if(Math.random()<(hype?.04:.02))mtone(note(96+[0,3,7,10][Math.floor(Math.random()*4)]),t,.06,'sine',.008);   // пиксельные блипы
     MUS.next+=st;MUS.step++}}
 function musicSync(){const want=S.music!==false&&!S.muted&&streamOn&&!document.hidden;if(want&&!MUS.on){const a=ac();if(!a)return;if(!MUS.gain){MUS.gain=a.createGain();MUS.gain.gain.value=.55;MUS.gain.connect(MASTER)}MUS.on=true;MUS.next=0;if(!MUS.timer)MUS.timer=setInterval(musicTick,60)}
   else if(!want&&MUS.on){MUS.on=false}}
