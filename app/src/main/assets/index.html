@@ -2376,7 +2376,7 @@ function catTick(){const now=Date.now();
   if(catHas('fix')&&now>catFixT){catFixT=now+60000;const b=[];S.cells.forEach((t,i)=>{if(t===BAD)b.push(i)});if(b.length){const j=pick(b);S.cells[j]=null;renderCell(j,true);burstAt(cellsEl[j],12);floatText(cellsEl[j],'КОТ FIX');goalEv('fix',1);toast('Кот-ремонтник починил сектор')}}}
 /* ---------- опросы чата ---------- */
 const POLL_OPT=[{id:'find',name:'НАЙТИ за полцены',d:'60 секунд'},{id:'combo',name:'Комбо ×2',d:'60 секунд'},{id:'income',name:'Доход ×1,5',d:'60 секунд'},
- {id:'gold',name:'Золотой дождь',d:'золотые клетки чаще 60 с'},{id:'calm',name:'Чат подождёт',d:'таймеры просьб стоят 60 с'},{id:'raid',name:'Позвать рейд',d:'рейд прямо сейчас',ok:()=>!S.orders.some(o=>o.kind==='raid')},
+ {id:'gold',name:'Золотая лихорадка',d:'золотые клетки чаще 60 с'},{id:'calm',name:'Чат подождёт',d:'таймеры просьб стоят 60 с'},{id:'raid',name:'Позвать рейд',d:'рейд прямо сейчас',ok:()=>!S.orders.some(o=>o.kind==='raid')},
  {id:'boss',name:'Призвать баг',d:'босс прямо сейчас, крупная награда',ok:()=>!S.boss&&S.best>=4}];
 var pollFx={};function pollOn(id){return(pollFx&&pollFx[id]||0)>Date.now()}
 let pollNext=Date.now()+150000;
