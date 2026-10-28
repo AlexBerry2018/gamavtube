@@ -12,12 +12,31 @@ jobs:
           distribution: temurin
           java-version: '17'
       - uses: gradle/actions/setup-gradle@v4
-      - name: Build APK
+      - name: Ключ подписи
+        env:
+          KS_B64: ${{ secrets.KS_B64 }}
+        run: |
+          if [ -n "$KS_B64" ]; then
+            echo "$KS_B64" | base64 -d > "$RUNNER_TEMP/upload.jks"
+            echo "KS_FILE=$RUNNER_TEMP/upload.jks" >> "$GITHUB_ENV"
+            echo "Подпись: ключ загрузки Google Play"
+          else
+            echo "Подпись: тестовая (секрет KS_B64 не задан)"
+          fi
+      - name: Build APK + AAB
+        env:
+          KS_PASS: ${{ secrets.KS_PASS }}
+          KS_ALIAS: ${{ secrets.KS_ALIAS }}
+          KS_KEY_PASS: ${{ secrets.KS_KEY_PASS }}
         run: |
           echo "ANDROID_HOME=$ANDROID_HOME"
           chmod +x gradlew
-          ./gradlew assembleRelease --no-daemon --stacktrace
+          ./gradlew assembleRelease bundleRelease --no-daemon --stacktrace
       - uses: actions/upload-artifact@v4
         with:
           name: Kristall2000-apk
           path: app/build/outputs/apk/release/*.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Kristall2000-aab-google-play
+          path: app/build/outputs/bundle/release/*.aab

@@ -4,20 +4,34 @@ plugins {
 
 android {
     namespace 'ru.kristall2000.game'
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         applicationId "ru.kristall2000.game"
         minSdk 24
-        targetSdk 34
-        versionCode 17
-        versionName "0.17-test"
+        targetSdk 35
+        versionCode 18
+        versionName "0.18"
+    }
+
+    signingConfigs {
+        upload {
+            // ключ загрузки для Google Play берётся из секретов GitHub (см. README)
+            def ks = System.getenv("KS_FILE")
+            if (ks) {
+                storeFile file(ks)
+                storePassword System.getenv("KS_PASS")
+                keyAlias System.getenv("KS_ALIAS")
+                keyPassword System.getenv("KS_KEY_PASS")
+            }
+        }
     }
 
     buildTypes {
         release {
             minifyEnabled false
-            signingConfig signingConfigs.debug   // тестовая подпись, чтобы APK сразу ставился на телефон
+            // есть секреты -> подпись ключом загрузки, нет -> тестовая подпись
+            signingConfig System.getenv("KS_FILE") ? signingConfigs.upload : signingConfigs.debug
         }
     }
     compileOptions {
