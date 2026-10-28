@@ -2276,48 +2276,40 @@ function react(key,t){if(S.tut<5||rlActive)return;const r=REACT[key];if(!r)retur
 /* ---------- музыка: чиптюн 2000-х ---------- */
 const MUS={on:false,gain:null,next:0,step:0,timer:null,hypeUntil:0,bar:0,pat:'K.K.S..K..K.S...'};
 /* атмосферный брейккор: мечтательные пэды с реверберацией и «качанием», нарезанные брейки, плаки, вокальные чопы. Все партии оригинальные */
-const JCH=[[50,53,57,60,64],[46,50,53,57,60],[43,46,50,53,57],[45,49,52,55,58]];   // Dm9 Bbmaj7 Gm9 A7b9
-const JROOT=[38,34,31,33];
-const JXYL=[[74,77,81,77,86,81,77,74,72,74,77,72,69,72,74,0],[70,74,77,74,82,77,74,70,69,70,74,77,81,0,79,77],[67,70,74,70,79,74,70,67,69,70,74,79,82,81,79,74],[73,76,79,76,82,79,76,73,81,0,79,0,76,0,73,0]];
+const JCH=[[53,57,60,64,67],[52,55,59,62,66],[50,53,57,60,64],[48,52,55,59,62]];   // Fmaj9 Em9 Dm9 Cmaj9
+const JROOT=[41,40,38,36];
 const JPLUCK=[[72,0,76,0,79,0,76,0,81,0,0,79,76,0,74,0],[71,0,74,0,78,0,0,76,74,0,71,0,69,0,0,0],[69,0,72,0,76,0,74,0,77,0,0,76,72,0,74,0],[72,0,0,71,72,0,74,0,76,0,0,0,79,0,0,0]];
 const JBREAK=['K.K.S..K..K.S...','K...S..K.K..S.K.','K.K.S..K..K.S.gS','K..KS.g..KK.S..g','K.S.K.S.KKS.S.SS','K.KgS.gK.gKgS.gg'];
 const JHALF='K.......S.......';
 function busInit(){if(MUS.verb)return;const a=AC,len=a.sampleRate*2.6,ir=a.createBuffer(2,len,a.sampleRate);
   for(let ch=0;ch<2;ch++){const d=ir.getChannelData(ch);for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,2.4)}
   MUS.verb=a.createConvolver();MUS.verb.buffer=ir;MUS.wet=a.createGain();MUS.wet.gain.value=.55;MUS.verb.connect(MUS.wet);MUS.wet.connect(MUS.gain);
-  MUS.pad=a.createGain();MUS.pad.gain.value=1;MUS.pad.connect(MUS.gain);MUS.pad.connect(MUS.verb);
-  const ws=a.createWaveShaper(),cv=new Float32Array(1024);for(let i=0;i<1024;i++){const x=i/511.5-1;cv[i]=Math.tanh(x*6)}ws.curve=cv;ws.oversample='2x';MUS.dist=a.createGain();MUS.dist.gain.value=.55;MUS.dist.connect(ws);ws.connect(MUS.gain)}
+  MUS.pad=a.createGain();MUS.pad.gain.value=1;MUS.pad.connect(MUS.gain);MUS.pad.connect(MUS.verb)}
 function mtone(f,t,d,type,vol,att,f2,bus){const a=AC;const o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.setValueAtTime(f,t);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+d);g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(vol,t+(att||.005));g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(bus||MUS.gain);o.start(t);o.stop(t+d+.02);return g}
 function mnoise(t,d,vol,freq,kind,q,bus){const a=AC;if(!NOISE)return;const src=a.createBufferSource(),f=a.createBiquadFilter(),g=a.createGain();src.buffer=NOISE;f.type=kind||'highpass';f.frequency.value=freq||7000;f.Q.value=q||.7;g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);src.connect(f);f.connect(g);g.connect(bus||MUS.gain);src.start(t,Math.random()*.5);src.stop(t+d+.02)}
 function duck(t){const g=MUS.pad.gain;g.cancelScheduledValues(t);g.setValueAtTime(.3,t);g.linearRampToValueAtTime(1,t+.28)}
-function jKick(t,v){mtone(170,t,.2,'sine',.17*v,.002,40);mnoise(t,.012,.08*v,4000,'bandpass',.8);duck(t)}
-function jSnare(t,v){mnoise(t,.13,.08*v,1800,'bandpass',.5);mnoise(t,.09,.06*v,2200,'bandpass',.6,MUS.dist);mtone(210,t,.06,'triangle',.03*v,.003,150,MUS.dist);if(v>.6)mnoise(t,.05,.02*v,2500,'bandpass',.5,MUS.verb)}
-function jHat(t,v,open){mnoise(t,open?.1:.025,(open?.022:.018)*v,9000)}
-function jXylo(f,t,v){mtone(f,t,.32,'sine',.06*v,.001);mtone(f*3.98,t,.07,'sine',.022*v,.001);mtone(f*9.2,t,.025,'sine',.01*v,.001);mnoise(t,.012,.02*v,3500,'bandpass',1.5);mtone(f,t,.4,'sine',.02*v,.001,0,MUS.verb)}
-function jReese(f,t,d,v){const a=AC,lp=a.createBiquadFilter(),g=a.createGain();lp.type='lowpass';lp.frequency.setValueAtTime(400,t);lp.frequency.linearRampToValueAtTime(1400,t+d*.5);lp.frequency.linearRampToValueAtTime(350,t+d);
-  g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(.05*v,t+.03);g.gain.setValueAtTime(.05*v,t+d*.8);g.gain.exponentialRampToValueAtTime(.0001,t+d);lp.connect(g);g.connect(MUS.dist);
-  [-12,12].forEach(c=>{const o=a.createOscillator();o.type='sawtooth';o.frequency.value=f;o.detune.value=c;o.connect(lp);o.start(t);o.stop(t+d+.02)})}
+function jKick(t,v){mtone(140,t,.18,'sine',.14*v,.003,42);duck(t)}
+function jSnare(t,v){mnoise(t,.12,.07*v,1700,'bandpass',.5);mtone(200,t,.06,'triangle',.028*v,.003,150);if(v>.6)mnoise(t,.05,.02*v,2500,'bandpass',.5,MUS.verb)}
+function jHat(t,v,open){mnoise(t,open?.1:.025,(open?.018:.014)*v,9000)}
 function jPluck(f,t,v){const g=mtone(f,t,.45,'triangle',.05*v,.003,0,MUS.verb);mtone(f,t,.3,'triangle',.03*v,.003);mtone(f*2,t,.12,'sine',.012*v,.002)}
 function jChop(f,t,d){const a=AC;const o=a.createOscillator(),f1=a.createBiquadFilter(),f2=a.createBiquadFilter(),g=a.createGain();o.type='sawtooth';o.frequency.setValueAtTime(f,t);
   f1.type='bandpass';f1.frequency.value=800;f1.Q.value=6;f2.type='bandpass';f2.frequency.value=1150;f2.Q.value=6;g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(.06,t+.03);g.gain.exponentialRampToValueAtTime(.0001,t+d);
   o.connect(f1);o.connect(f2);f1.connect(g);f2.connect(g);g.connect(MUS.pad);o.start(t);o.stop(t+d+.02)}
 function musicTick(){const a=live();if(!a||!MUS.on)return;if(!NOISE)noise(.01,.0001,1000);busInit();
-  const hype=Date.now()<MUS.hypeUntil||hy.c>=5&&Date.now()-hy.t<2600||S.orders.some(o=>o.kind==='raid'||o.flash)||!!S.boss,bpm=hype?178:172,st=60/bpm/4;
+  const hype=Date.now()<MUS.hypeUntil||hy.c>=5&&Date.now()-hy.t<2600||S.orders.some(o=>o.kind==='raid'||o.flash)||!!S.boss,bpm=hype?174:168,st=60/bpm/4;
   if(MUS.next<a.currentTime)MUS.next=a.currentTime+.05;
   while(MUS.next<a.currentTime+.3){const t=MUS.next,i=MUS.step%16,bar=Math.floor(MUS.step/16),ci=bar%4,part=hype?1:Math.floor(bar/8)%4,pb=bar%8,ch=JCH[ci];
     // части: 0 — вступление в полутемпе, 1–2 — брейки, 3 — брейкдаун без барабанов первые 4 такта
     if(i===0){MUS.pat=part===0?JHALF:(pb===7&&(hype||Math.random()<.5))?JBREAK[4+Math.floor(Math.random()*2)]:JBREAK[Math.floor(Math.random()*4)]}
     const drums=!(part===3&&pb<4),c=MUS.pat[i];
     if(drums){if(c==='K')jKick(t,1);if(c==='S')jSnare(t,1);else if(c==='g')jSnare(t,.3);jHat(t,i%2?.6:1,i===6||i===14);
-      if(Math.random()<(hype?.12:.05)){for(let k=1;k<3;k++)jSnare(t+st/3*k,.4)}}
+      if(hype&&Math.random()<.06){for(let k=1;k<3;k++)jSnare(t+st/3*k,.35)}}
     // саб-бас
-    if(drums&&(i===0||i===10))mtone(note(JROOT[ci]),t,st*(i===0?6:4),'sine',.12,.01);
-    if(drums&&part!==0&&(i===0||i===8))jReese(note(JROOT[ci]+12),t,st*7.5,1);
+    if(drums&&(i===0||i===10))mtone(note(JROOT[ci]),t,st*(i===0?6:4),'sine',.11,.02);
     // пэд: аккорд на весь такт, «качается» от бочки
     if(i===0)ch.forEach((n,k)=>mtone(note(n),t+k*.015,st*16.5,'triangle',.014,.35,0,MUS.pad));
     // плаки-мелодия (как музыка из старой игры, но мягко)
-    const xn=JXYL[ci][i];if(xn&&(part!==0||i%4===0))jXylo(note(xn),t,part===0?.7:1);
-    const ln=JPLUCK[ci][i];if(ln&&part===3&&pb<4)jPluck(note(ln-12),t,.8);
+    const ln=JPLUCK[ci][i];if(ln&&(part===2||part===3||hype))jPluck(note(ln),t,1);
     // мерцающее арпеджио
     if(part!==0&&i%2===1)mtone(note(ch[((i-1)/2)%ch.length]+24),t,st*2,'sine',.007,.003,0,MUS.verb);
     // вокальные чопы «аа»
