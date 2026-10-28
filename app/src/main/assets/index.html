@@ -673,7 +673,7 @@ html.desk .order.ready,html.desk .btn,html.desk .tb,html.desk .bface,html.desk .
 
 /* ---- вертикальный режим: поле главное ---- */
 html.vert[data-ph] .term{gap:6px}
-html.vert[data-ph] .sbar,html.vert[data-ph] .clock,html.vert[data-ph] .fk{display:none}
+html.vert[data-ph] .clock,html.vert[data-ph] .fk{display:none}
 html.vert[data-ph] .tbar{flex-wrap:nowrap;gap:6px}
 html.vert[data-ph] .prompt{flex:none;font-size:.6rem}
 html.vert[data-ph] #streamTitle,html.vert[data-ph] .prompt .cur{display:none}
@@ -707,6 +707,17 @@ html.vert[data-ph] .k .m,html.vert[data-ph] .k .d{display:none}
 
 .whead{align-items:center}.whead span:last-child{flex:none;min-width:28px;text-align:center;padding:1px 8px!important;margin:-2px -4px -2px 0;background:#d4d0c8;color:#000;border:2px solid;border-color:#fff #404040 #404040 #fff;font-weight:700}
 .whead span:last-child:active{border-color:#404040 #fff #fff #404040}
+
+.sbar>span:not(.goalsbar){display:none}
+.sbar{cursor:pointer}
+:root[data-ph] .sbar .goalsbar{flex:1;min-width:0;border:0;padding:0 4px;font-size:.62rem;font-weight:700;color:#000;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.goalsbar i{font-style:normal;color:#808080}.goalsbar b{color:var(--red)}.goalsbar u{text-decoration:none;color:#1a8a3a}
+html.vert[data-ph] .sbar{margin:0}
+.cell.gold{box-shadow:0 0 0 3px #f2b705,0 0 14px 4px rgba(242,183,5,.75)!important;animation:goldp .7s steps(2) infinite;z-index:2}
+@keyframes goldp{50%{box-shadow:0 0 0 3px #ffde59,0 0 20px 8px rgba(242,183,5,.9)}}
+.goals{display:flex;flex-direction:column;gap:6px;margin:8px 0}
+.goal{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;padding:6px 8px;border:2px solid var(--ph);font-size:.72rem}
+.goal.done{background:var(--ph);color:#fff}
 </style>
 <script>/* мост к Android: вибрация через нативный API */
 if(window.AndroidApp){navigator.vibrate=function(p){try{AndroidApp.vibrate(JSON.stringify(Array.isArray(p)?p:[p]))}catch(e){}return true}}</script>
@@ -756,7 +767,7 @@ ________________________________________________</pre><span class="camrec" aria-
         <dl><dt>Пробел</dt><dd>Найти</dd><dt>1 · 2 · 3</dt><dd>Автозагрузка · Разгон · Бонус</dd><dt>F1–F5</dt><dd>Дары · Комната · Ларёк · Образ · Сист</dd><dt>E</dt><dd>Событие</dd><dt>K</dt><dd>Погладить кота</dd><dt>M</dt><dd>Ночной марафон</dd><dt>H</dt><dd>Обучение</dd><dt>Esc</dt><dd>Закрыть окно</dd><dt>ЛКМ</dt><dd>Перетащить артефакт</dd></dl>
       </section>
     </div>
-    <div class="sbar" aria-hidden="true"><span id="sbConn">Connected 0:00:00</span><span>Auto detect</span><span>56K</span><span class="off">SCROLL</span><span id="sbCaps">CAPS</span><span class="off">NUM</span></div>
+    <div class="sbar" id="sbar"><span class="goalsbar" id="goalsBar"></span><span id="sbConn">Connected 0:00:00</span><span>Auto detect</span><span>56K</span><span class="off">SCROLL</span><span id="sbCaps">CAPS</span><span class="off">NUM</span></div>
     <div class="event" id="event" hidden>
       <div class="evwrap">
         <div class="evtop">
@@ -801,7 +812,7 @@ const NAMES=['Стразик','Заколка-бабочка','Кассета','
 const HUES=[320,270,30,200,175,195,185,330,280,90,190,300,50,330,45,20,230,345,220,240,215,100,220,180];
 const MAX=NAMES.length-1,N=30,KEY='crystal-mine-v2'+(()=>{try{return new URLSearchParams(location.search).get('slot')||''}catch(e){return''}})(),OFFLINE_CAP=2*3600*1000,OFFLINE_RATE=0.5;
 /* economy v2 — tuned with balance_v2.py */
-const CONV_MAX=8,PRESTIGE_TIER=5,DUST_BONUS=0.1,Q_STEP=10,Q0=1000,QG=2.4,SP0=5,SPG=2.3,SPN=1.12,C0=150,CG=5,ORD_K=40,ORD_CD=90000,CHEST_EVERY=6,BASE_MAX=7,BASE_GAP=3,START_K=.25;
+const CONV_MAX=8,PRESTIGE_TIER=5,DUST_BONUS=0.1,Q_STEP=10,Q0=1000,QG=2.5,SP0=5,SPG=2.3,SPN=1.14,C0=150,CG=5,ORD_K=40,ORD_CD=90000,CHEST_EVERY=6,BASE_MAX=7,BASE_GAP=3,START_K=.25;
 const income=t=>Math.pow(2.6,t);
 let BC=6;
 const J=100,GEN=101,BAD=102,BOSS=104,GEN_INT=20;
@@ -1145,7 +1156,7 @@ function discover(t,el){if(t<=S.best)return;S.best=t;if(t>S.codex)S.codex=t;cons
 /* ---------- orders (pager messages) ---------- */
 const REQ_NAMES=['xXx_Lera_xXx','Kiber_Tim','~*Ksu*~','NeoHacker','dj_Vasya','Glitter_Girl','Millenium99','Flash_Max','Tamago4i','olds_2001','nya_nya','ModemMan','old_school','pager_girl'];
 const REQ_VERB=['покажи','хочу','дай','где','скинь'];
-const OK=o=>o.kind||'give',QUEST_TIME=60000,PATIENCE=()=>Math.round((150+Math.random()*90)*1000),hasLeft=o=>{const k=OK(o);return k==='give'||k==='many'};
+const OK=o=>o.kind||'give',QUEST_TIME=60000,PATIENCE=()=>Math.round((110+Math.random()*70)*1000),hasLeft=o=>{const k=OK(o);return k==='give'||k==='many'};
 const leftTxt=o=>hasLeft(o)&&o.left!=null?' '+mmss(Math.max(0,o.left)):'';
 function shelfFree(){return SETS.some(st=>st.items.some(t=>!(S.room||[]).includes(t)))}
 function newOrder(){S.orderSeq++;const user=pick(REQ_NAMES),chest=S.orderSeq%CHEST_EVERY===0,R=refIncome(),lk=(setDone('link')?1.3:1)*(setDone('mobile')?1.2:1)*(th('challenge')?2:1),used=S.orders.map(OK),pool=['give','give','give'];
@@ -1160,7 +1171,7 @@ function newOrder(){S.orderSeq++;const user=pick(REQ_NAMES),chest=S.orderSeq%CHE
   return{kind:'shelf',need:1,n:0,user,reward:Math.round(R*20*lk),chest}}
 function cntTier(t){return S.cells.filter(x=>x===t).length}
 function oReady(o){const k=OK(o);if(k==='troll'||k==='sing'||k==='wheel')return true;return k==='give'?hasTier(o.tier)>=0:k==='many'?cntTier(o.tier)>=o.need:o.n>=o.need}
-function questProg(kind){let hit=false;const now=Date.now();S.orders.forEach(o=>{if(o.kind==='raid'&&kind==='merge'&&o.n<o.need&&o.until>now){o.n++;hit=true;if(o.n>=o.need){toast('Рейд доволен! Забери награду');sfx.coin()}return}if(o.kind!==kind||o.n>=o.need)return;
+function questProg(kind){goalEv(kind);let hit=false;const now=Date.now();S.orders.forEach(o=>{if(o.kind==='raid'&&kind==='merge'&&o.n<o.need&&o.until>now){o.n++;hit=true;if(o.n>=o.need){toast('Рейд доволен! Забери награду');sfx.coin()}return}if(o.kind!==kind||o.n>=o.need)return;
   if(kind==='merge'){if(!o.until||o.until<now){o.n=0;o.until=now+QUEST_TIME}}o.n++;hit=true;
   if(o.n>=o.need){o.until=0;logChat(o.user,pick(['вот это да!','засчитано!!','ты смогла','+rep']),'me');toast('Просьба чата выполнена: забери награду');sfx.coin()}});
   if(hit)renderOrders()}
@@ -1178,7 +1189,7 @@ function fulfill(k,cell){const o=S.orders[k];if(!o)return;const kd=OK(o);if(kd==
   else if(kd==='many'){if(cntTier(o.tier)<o.need){toast(`Нужно ${o.need} шт. «${NAMES[o.tier]}» на поле одновременно`);sfx.deny();return}}
   else if(!oReady(o)){toast(QHINT[kd]);sfx.deny();return}
   const card=$('orders').children[k];if(card){burstAt(card,18,kd==='give'||kd==='many'?HUES[o.tier]:undefined);floatText(card,'+'+fmt(o.reward))}
-  if(kd==='give'){S.cells[cell]=null;renderCell(cell)}else if(kd==='many'){let left=o.need;if(cell!==undefined&&S.cells[cell]===o.tier){S.cells[cell]=null;renderCell(cell);left--}for(let i=0;i<N&&left>0;i++)if(S.cells[i]===o.tier){S.cells[i]=null;renderCell(i);left--}}addCoins(o.reward);S.stats.orders++;buddy('order');chat('order',2);logChat(o.user||'viewer',pick(['спасибо!!',kd==='give'?'ура, '+NAMES[o.tier]+'!':'вот это стрим!','лучшая стримерша','<3 <3','держи лайк']),'me');addSubs(Math.random()<.5?2:1);viewers*=1.03;moodBump(3);S.orders.splice(k,1);(S.ordPending=S.ordPending||[]).push(Date.now()+(S.tut<5?3000:th('quiz')?ORD_CD/2:ORD_CD));ensureOrders();sfx.coin();tutEvent('order');
+  if(kd==='give'){S.cells[cell]=null;renderCell(cell)}else if(kd==='many'){let left=o.need;if(cell!==undefined&&S.cells[cell]===o.tier){S.cells[cell]=null;renderCell(cell);left--}for(let i=0;i<N&&left>0;i++)if(S.cells[i]===o.tier){S.cells[i]=null;renderCell(i);left--}}addCoins(o.reward);S.stats.orders++;buddy('order');chat('order',2);logChat(o.user||'viewer',pick(['спасибо!!',kd==='give'?'ура, '+NAMES[o.tier]+'!':'вот это стрим!','лучшая стримерша','<3 <3','держи лайк']),'me');addSubs(Math.random()<.5?2:1);viewers*=1.03;moodBump(3);S.orders.splice(k,1);(S.ordPending=S.ordPending||[]).push(Date.now()+(S.tut<5?3000:th('quiz')?ORD_CD/2:ORD_CD));ensureOrders();sfx.coin();tutEvent('order');goalEv('order');
   if(o.chest)openChest('Сундук за просьбу чата');save()}
 $('orders').addEventListener('click',e=>{const b=e.target.closest('button.order');if(b)fulfill(+b.dataset.k)});
 
@@ -1208,13 +1219,13 @@ attachDrag(grid,{get:i=>S.cells[i],fixed:i=>S.cells[i]===BAD||S.cells[i]===BOSS,
     const a=S.cells[from],b=S.cells[target.i],to=target.i;
     if(b===BAD){toast('Битый сектор. Объедини что-нибудь рядом');sfx.deny();return}
     if(b===BOSS){toast('Бей босса слияниями в соседних клетках!');sfx.deny();return}
-    const rc=recipeOf(a,b);if(rc>=0){S.cells[to]=REC0+rc;S.cells[from]=null;S.stats.merges++;renderCell(from);renderCell(to,true);flash(cellsEl[to]);clearAround(to);recipeFound(rc,cellsEl[to]);questProg('merge');save();return}
+    const rc=recipeOf(a,b);if(rc>=0){S.cells[to]=REC0+rc;S.cells[from]=null;S.stats.merges++;renderCell(from);renderCell(to,true);flash(cellsEl[to]);clearAround(to);recipeFound(rc,cellsEl[to]);questProg('merge');hypeMerge(to,0);save();return}
     let res=null;const jt=a===J&&isItem(b)?b:b===J&&isItem(a)?a:null;
     if(jt!==null){if(jt>S.best-2){toast(`Флешка берёт только артефакты до «${NAMES[Math.max(0,S.best-2)]}»`);sfx.deny();return}res=jt+1}else if(isItem(a)&&a===b)res=a+1;
     if(res!==null){if(res>MAX){toast('Это самый ценный артефакт');return}
       S.cells[to]=res;S.cells[from]=null;S.stats.merges++;renderCell(from);renderCell(to,true);flash(cellsEl[to]);
       burstAt(cellsEl[to],10+res*2);sfx.merge(res);if(res<=S.best&&Math.random()<.45)buddy('merge');chat('merge',1+Math.floor(Math.random()*2));
-      clearAround(to);if(res<=S.best)bigFx(res);discover(res,cellsEl[to]);tutEvent('merge');questProg('merge')}
+      clearAround(to);if(res<=S.best)bigFx(res);discover(res,cellsEl[to]);tutEvent('merge');questProg('merge');hypeMerge(to,res)}
     else{S.cells[to]=a;S.cells[from]=b;renderCell(from);renderCell(to)}
     save()}});
 const nbrs=(i,cols,n)=>{const r=[],x=i%cols;if(x>0)r.push(i-1);if(x<cols-1)r.push(i+1);if(i-cols>=0)r.push(i-cols);if(i+cols<n)r.push(i+cols);return r};
@@ -1640,10 +1651,10 @@ function startRaid(){const who=pick(RAIDERS),n=Math.round(viewers*(1+Math.random
 function raidWin(k){const o=S.orders[k];S.orders.splice(k,1);addCoins(o.reward);addSubs(Math.max(10,Math.round(o.raiders*.08)));moodBump(12);S.stats.raids=(S.stats.raids||0)+1;
   const card=$('orders').children[k];if(card){burstAt(card,26);floatText(card,'+'+fmt(o.reward))}sfx.fanfare();cutin('РЕЙД ДОВОЛЕН!',`+${fmtInt(Math.max(10,Math.round(o.raiders*.08)))} подписчиков`,'neko');
   logChat(o.user,'остаёмся! подписались!','me');renderOrders();save()}
-function startTroll(){const who=pick(TROLLS);S.orders.unshift({kind:'troll',user:who,text:pick(TROLL_TXT),until:Date.now()+12000,reward:Math.round(refIncome()*30)});renderOrders();
+function startTroll(){const who=pick(TROLLS);S.orders.unshift({kind:'troll',user:who,text:pick(TROLL_TXT),until:Date.now()+10000,reward:Math.round(refIncome()*30)});renderOrders();
   for(let i=0;i<4;i++)setTimeout(()=>chatSpawn(pick(TROLL_TXT),true,who),i*500);setFace('angry',false,true);
   typeLine('Тролль в чате! Тыкни меня или БАН! '+smiles(1),'angry',true);sfx.deny()}
-function banTroll(k){const o=S.orders[k];if(!o||o.kind!=='troll')return;S.orders.splice(k,1);addCoins(o.reward);moodBump(5);S.stats.bans=(S.stats.bans||0)+1;
+function banTroll(k){const o=S.orders[k];if(!o||o.kind!=='troll')return;S.orders.splice(k,1);addCoins(o.reward);moodBump(5);S.stats.bans=(S.stats.bans||0)+1;goalEv('ban');
   const card=$('orders').children[k];if(card){burstAt(card,20);floatText(card,'БАН!')}sfx.coin();shake();
   typeLine(`${o.user} забанен! `+smiles(1),'cool',true);spamFrom($('bface'),3);
   for(let i=0;i<3;i++)setTimeout(()=>logChat(pick(REQ_NAMES),pick(['кот-модератор топ','БАН!!!','так ему','спасибо, кот','F тролль']),'me'),300+i*400);renderOrders();save()}
@@ -1659,8 +1670,8 @@ setInterval(()=>{if(!streamOn||S.tut<5||E||rlActive||document.hidden)return;cons
     else if(o.kind==='raid'&&o.until<=now&&o.n<o.need){S.orders.splice(k,1);logChat(o.user,pick(['скучно, уходим','ну и ладно','пока!']),'hot');viewers*=.8;moodBump(-10);toast('Рейд ушёл, не дождавшись: зрители −20%');ch=true}}
   if(ch){renderOrders();ensureOrders()}
   if(th('chill')||!overlay.hidden||now<streamEvT||S.orders.some(o=>o.kind==='raid'||o.kind==='troll'))return;
-  streamEvT=now+(6+Math.random()*8)*60000;if(S.best<3)return;
-  if(Math.random()<.55)startRaid();else startTroll()},1000);
+  streamEvT=now+(2.5+Math.random()*2.5)*60000;if(S.best<3)return;
+  const rr=Math.random();if(rr<.28)startRaid();else if(rr<.56)startTroll();else if(rr<.84)startFlash();else startDdos()},1000);
 
 /* ---------- danmaku: random viewer comments scrolling over the screen ---------- */
 const CHAT={
@@ -1793,12 +1804,12 @@ function tick(now){const dt=Math.min((now-lastT)/1000,1);lastT=now;
   if(S.conv){convT+=dt;if(convT>=convInterval()){if(spawn(false))convT=0;else convT=convInterval()}$('convBar').style.width=Math.min(100,convT/convInterval()*100)+'%'}
   if(E){E.spawnT+=dt;if(E.spawnT>=EV_SPAWN){E.spawnT=0;evSpawn()}if(Date.now()>=E.end)endEvent();else{evUI(false);const sl=Math.ceil((E.end-Date.now())/1000);if(sl<=10&&sl!==E.lastTick){E.lastTick=sl;sfx.tick()}}}
   S.genT=(S.genT||0)+dt;if(S.genT>=GEN_INT){S.genT=0;genTick()}
-  S.virT=(S.virT||0)+dt;if(S.virT>=100){S.virT=0;virusTick()}
+  S.virT=(S.virT||0)+dt;if(S.virT>=80){S.virT=0;virusTick()}
   if(E&&E.mode==='shrink'){E.shrinkT+=dt;if(E.shrinkT>=25){E.shrinkT=0;const e=[];E.cells.forEach((t,i)=>{if(t===null)e.push(i)});if(e.length){const j=e[Math.floor(Math.random()*e.length)];E.cells[j]=BAD;evRender(j,true);toast('Сектор повреждён! Объединяй рядом');sfx.deny()}}}
   if(S.tut>=5){scNext-=dt;if(scNext<=0){scNext=(70+Math.random()*80)*moodLv().sc;if(overlay.hidden)superchat()}}
   stepFx(dt);drawScope(now);
   saveT+=dt;if(saveT>2){saveT=0;save()}
-  slowT+=dt;if(slowT>0.25){slowT=0;const r=ordersKey();const ps=(S.ordPending||[]).length?Math.floor(Date.now()/1000):0;if(ps&&ps!==lastPend){lastPend=ps;lastReady=r;ensureOrders()}else if(r!==lastReady){lastReady=r;renderOrders()}updateDots();updateBanner();updateClock();tutTick();updateArt();updateStream();if(Math.random()<.02)schedCheck();{const sec=Math.floor((performance.now()-T0)/1000);$('sbConn').textContent=`Connected ${Math.floor(sec/3600)}:${String(Math.floor(sec/60)%60).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}`;$('sbCaps').classList.toggle('off',!E)}$('boardTtl').textContent=nextInfo();if(E)evUI(true);
+  slowT+=dt;if(slowT>0.25){slowT=0;const r=ordersKey();const ps=(S.ordPending||[]).length?Math.floor(Date.now()/1000):0;if(ps&&ps!==lastPend){lastPend=ps;lastReady=r;ensureOrders()}else if(r!==lastReady){lastReady=r;renderOrders()}updateDots();updateBanner();updateClock();tutTick();updateArt();updateStream();if(Math.random()<.02)schedCheck();{const sec=Math.floor((performance.now()-T0)/1000);$('sbConn').textContent=`Connected ${Math.floor(sec/3600)}:${String(Math.floor(sec/60)%60).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}`;$('sbCaps').classList.toggle('off',!E)}$('boardTtl').textContent=hyLabel()+nextInfo();if(E)evUI(true);
     const h=hintText();const hn=$('hint');if(h&&hn.dataset.auto!==h){hn.dataset.auto=h;if(S.buddy)typeLine(h+' '+smiles(1),'wink');else hn.textContent=h}}
   updateUI();requestAnimationFrame(tick)}
 
@@ -1883,7 +1894,7 @@ function renderDesk(){$('wall').textContent=asciiFrom(Math.max(0,S.best));
   if(msg&&!streamOn){const b=document.createElement('div');b.className='balloon';b.innerHTML=`<b>${msg[0]}</b>${msg[1]}`;b.onclick=()=>{b.remove();deskAction('sched')};tb.appendChild(b);setTimeout(()=>b.remove(),9000)}}
 function deskAction(a){if(a==='off'){shutdown();return}launchStream();
   const after={room:showRoom,gifts:showDaily,event:evIntro,settings:showMenu,ward:showWardrobe,sched:showSched,shop:showShop,trip:showTrip,marathon:rlOpen}[a];if(after)setTimeout(after,streamOn?380:1400)}
-function launchStream(){const pc=$('pc');pc.classList.add('out');sfx.key('5');setTimeout(()=>{pc.hidden=true;pc.classList.remove('out');fitAll()},REDUCED?0:340);
+function launchStream(){if(S.tut>=5)newGoals();const pc=$('pc');pc.classList.add('out');sfx.key('5');setTimeout(()=>{pc.hidden=true;pc.classList.remove('out');fitAll()},REDUCED?0:340);
   if(!streamOn){streamOn=true;startUp();setTimeout(schedCheck,REDUCED?400:1800);tourMaybe()}}
 function showDesk(){const pc=$('pc');renderDesk();pc.hidden=false;pc.classList.add('desk-on');$('desk').hidden=false;$('splash').hidden=true;$('bootTxt').hidden=true}
 function shutdown(){const pc=$('pc');$('desk').hidden=true;$('bootTxt').hidden=false;$('bootTxt').textContent='\n\n   Теперь питание компьютера можно отключить.\n\n   [ нажми, чтобы включить снова ]';pc.classList.remove('desk-on');pcBoot(true)}
@@ -2101,7 +2112,7 @@ const TOUR_MAIN=[
  {el:()=>[$('adBtn')],t:'Бонус',d:'Удваивает доход на 2 минуты за просмотр ролика.'},
  {el:()=>[$('dailyBtn'),$('roomBtn'),$('shopBtn'),$('wardBtn'),$('menuBtn')],t:'Верхнее меню',d:'ДАРЫ — подарок каждый день. КОМНАТА — полки для наборов и мебель. ЛАРЁК — энергетики и флешки за монеты. ОБРАЗ — одежда стримерши и кота. СИСТ — настройки, коллекция и рецепты.'},
  {el:()=>[$('startBtn')],t:'Пуск',d:'Рабочий стол компьютера: Ночной марафон, Кот-курьер, Расписание стримов, События. Туда же можно вернуться в любой момент.'},
- {el:()=>[document.querySelector('.sbar')],t:'Строка уведомлений',d:'Внизу появляются короткие сообщения «alert»: что получено, что изменилось. Повторить это обучение можно в СИСТ.'},
+ {el:()=>[document.querySelector('.sbar')],t:'Цели эфира',d:'Внизу три цели на этот стрим. За каждую — монеты и подписчики, за все три — большой бонус. Нажми на строку, чтобы открыть список. Ещё: быстрые слияния подряд дают КОМБО, а золотую клетку выгодно занять слиянием.'},
  {el:()=>[document.querySelector('.boardp')],t:'Поехали!',d:'Начнём с главного: перетащи один Стразик на другой.'}];
 const TOUR_RL_MAP=[
  {el:()=>[document.querySelector('.rlhud')],t:'Сигнал и забег',d:'Сигнал — твои жизни в марафоне. Рядом — монеты забега, этаж и собранные усиления. Красным подсвечены проклятия.'},
@@ -2177,6 +2188,43 @@ window.K2DBG={
   rlboss(){this.closeAll();if(!S.run)rlNewRun();rlOpen();S.run.col=6;S.run.row=0;rlWave('boss')},
   reset(){try{localStorage.removeItem(KEY)}catch(e){}location.reload()}
 };
+
+/* ---------- азарт: комбо, золотая клетка, цели эфира, новые события ---------- */
+const hy={c:0,t:0};
+function hyLabel(){return hy.c>=3&&Date.now()-hy.t<2600?`КОМБО ×${hy.c} · `:''}
+function hypeMerge(i,res){const now=Date.now();hy.c=now-hy.t<2600?hy.c+1:1;hy.t=now;
+  if(hy.c>=3){const b=refIncome()*hy.c*1.5;addCoins(b);floatText(cellsEl[i],`КОМБО ×${hy.c} +${fmt(b)}`);if(hy.c===5||hy.c===10||hy.c===15){cutin(`КОМБО ×${hy.c}!`,'чат в восторге','eyes');moodBump(4);chat('combo',3)}}
+  goalEv('combo',hy.c);if(res)goalEv('tier',res);
+  if(gold&&gold.i===i&&Date.now()<gold.until){const g=Math.max(refIncome()*45,income(Math.max(0,res-1))*mult()*90);addCoins(g);floatText(cellsEl[i],'ЗОЛОТО +'+fmt(g));burstAt(cellsEl[i],30,48);sfx.fanfare();toast('Золотая клетка! +'+fmt(g));goalEv('gold');goldOff()}}
+let gold=null,goldNext=Date.now()+40000;
+function goldOff(){if(gold&&cellsEl[gold.i])cellsEl[gold.i].classList.remove('gold');gold=null;goldNext=Date.now()+(35+Math.random()*35)*1000}
+function goldTick(){const now=Date.now();if(gold){if(now>gold.until){goldOff()}return}if(now<goldNext)return;
+  const c=[];S.cells.forEach((t,i)=>{if(isItem(t))c.push(i)});if(c.length<2){goldNext=now+10000;return}
+  const i=pick(c);gold={i,until:now+20000};cellsEl[i].classList.add('gold');toast('Золотая клетка! Слей что-нибудь в неё за 20 с');sfx.spawn()}
+const GOAL_T={merge:{t:n=>`${n} слияний`,base:[18,30]},spawn:{t:n=>`НАЙТИ ×${n}`,base:[20,32]},order:{t:n=>`${n} просьб чата`,base:[3,5]},
+  combo:{t:n=>`комбо ×${n}`,base:[4,6],max:1},tier:{t:n=>`создай «${NAMES[n]}»`,base:[0,0],max:1},gold:{t:n=>`${n} золотые клетки`,base:[2,3]},ban:{t:n=>`забань тролля`,base:[1,1]}};
+function newGoals(){const lv=S.goalsLv||0,k=1+lv*.15,keys=Object.keys(GOAL_T).filter(x=>x!=='ban'||S.best>=3).sort(()=>Math.random()-.5).slice(0,3);
+  S.goals=keys.map(key=>{const g=GOAL_T[key];let need=g.base[0]+Math.floor(Math.random()*(g.base[1]-g.base[0]+1));
+    if(key==='tier')need=Math.max(1,S.best);else if(key==='combo')need=Math.min(9,need+Math.floor(lv/2));else need=Math.round(need*k);return{k:key,need,n:0,done:false}});renderGoals();save()}
+function goalEv(kind,v){if(!S.goals||S.tut<5)return;let ch=false;
+  S.goals.forEach((g,ix)=>{if(g.done||g.k!==kind)return;if(GOAL_T[kind].max){if(v>g.n){g.n=Math.min(g.need,v);ch=true}}else{g.n++;ch=true}
+    if(g.n>=g.need){g.done=true;const r=refIncome()*90;addCoins(r);addSubs(4);sfx.chest();toast(`Цель эфира выполнена: ${GOAL_T[kind].t(g.need)} · +${fmt(r)}`)}});
+  if(!ch)return;if(S.goals.every(g=>g.done)){const r=refIncome()*400;addCoins(r);addSubs(20);moodBump(15);S.goalsLv=(S.goalsLv||0)+1;
+    cutin('ВСЕ ЦЕЛИ!',`+${fmt(r)} и новые цели`,'neko');sfx.fanfare();for(let i=0;i<5;i++)setTimeout(()=>chatSpawn(pick(['ЛЕГЕНДА','GG','топ стрим','8888']),true),200+i*250);setTimeout(newGoals,1500)}
+  renderGoals()}
+function renderGoals(){const el=$('goalsBar');if(!el)return;if(!S.goals||S.tut<5){el.textContent='';return}
+  el.innerHTML='ЦЕЛИ: '+S.goals.map(g=>g.done?`<u>✓ ${GOAL_T[g.k].t(g.need)}</u>`:`${GOAL_T[g.k].t(g.need)}${g.k==='tier'?'':` <b>${g.n}/${g.need}</b>`}`).join(' <i>·</i> ')}
+function showGoals(){if(!S.goals)newGoals();openSheet(`<h2>Цели эфира</h2><p>Три цели на этот стрим. За каждую: монеты и подписчики. Все три: большой бонус и новые цели посложнее (уровень ${(S.goalsLv||0)+1}).</p>
+  <div class="goals">${S.goals.map(g=>`<div class="goal${g.done?' done':''}"><b>${g.done?'✓':'○'}</b><span>${GOAL_T[g.k].t(g.need)}</span><span>${g.k==='tier'?(g.done?'есть':'нет'):g.n+'/'+g.need}</span></div>`).join('')}</div>
+  <p class="dim">Также: комбо (слияния подряд быстрее 2,5 с) дают бонус, а в золотую клетку выгодно сливать артефакты.</p>`,'goals.txt')}
+$('sbar').addEventListener('click',()=>{if(S.tut>=5)showGoals()});
+function startFlash(){const hi=Math.max(0,S.best-1),lo=Math.max(0,S.best-3),tier=lo+Math.floor(Math.random()*(hi-lo+1)),user=pick(REQ_NAMES);
+  S.orders.unshift({kind:'give',tier,user,verb:'СРОЧНО',flash:true,left:45000,reward:Math.round((income(tier)*ORD_K*mult()+refIncome()*20)*2)});renderOrders();
+  cutin('СРОЧНО!',`${user} ждёт ${NAMES[tier]} 45 секунд`,'eyes');sfx.fanfare();for(let i=0;i<3;i++)setTimeout(()=>chatSpawn(pick(['быстрее!!','успеет?','45 сек!!','давай-давай']),Math.random()<.5),200+i*300)}
+function startDdos(){const e=emptyCells();let k=0;for(let n=0;n<3&&e.length&&S.cells.filter(t=>t===BAD).length<8;n++){const j=e.splice(Math.floor(Math.random()*e.length),1)[0];S.cells[j]=BAD;renderCell(j,true);k++}
+  if(!k)return;cutin('DDOS-АТАКА!',`${k} сектора повреждены`,'shock');shake();sfx.deny();moodBump(-5);toast('DDoS! Сливай артефакты рядом с битыми секторами')}
+setInterval(()=>{if(!streamOn||S.tut<5||E||rlActive||document.hidden||!overlay.hidden||tourOn)return;if(!S.goals)newGoals();goldTick()},1000);
+renderGoals();
 </script>
 
 </body></html>
