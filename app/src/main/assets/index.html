@@ -1620,12 +1620,16 @@ function bossWin(){const b=S.boss,R=refIncome(),v=Math.round(R*300);S.cells[b.ce
   addCoins(v);addSubs(Math.max(40,Math.round(subGoal()*.06)));moodBump(20);S.stats.bosses=(S.stats.bosses||0)+1;
   cutin('ПОБЕДА!!',`баг повержен · +${fmt(v)}`,'neko');sfx.fanfare();for(let i=0;i<8;i++)setTimeout(()=>chatSpawn(pick(['ПОБЕДА!!!','GG','8888888','легенда','баг повержен','мы сделали это']),true),200+i*220);
   setTimeout(()=>openChest('Трофей с босса'),2200);save()}
+function bossBreathe(){const b=S.boss;if(!b)return;const nb=nbrs(b.cell,BC,N),bad=nb.filter(j=>S.cells[j]===BAD),need=Math.min(2,nb.length)-(nb.length-bad.length);
+  for(let k=0;k<need;k++){const j=bad.splice(Math.floor(Math.random()*bad.length),1)[0];S.cells[j]=null;renderCell(j,true);burstAt(cellsEl[j],12);floatText(cellsEl[j],'FIX')}
+  if(need>0)toast('Баг окружён: сектор рядом с ним починен, бей!')}
 function bossFail(){const b=S.boss;S.cells[b.cell]=BAD;shown[b.cell]=undefined;renderCell(b.cell,true);S.boss=null;moodBump(-15);viewers*=.85;
   toast('Баг сбежал и оставил битые сектора');logChat('hater_2000','ахах, проиграла баг','hot');sfx.deny();save()}
 setInterval(()=>{if(!streamOn||S.tut<5||document.hidden||E||rlActive)return;const now=Date.now();
   if(S.boss){if(S.cells[S.boss.cell]!==BOSS){S.boss=null;return}
     if(now>S.boss.until){bossFail();return}
-    if(now-bossT>15000&&overlay.hidden){bossT=now;const near=nbrs(S.boss.cell,BC,N).filter(j=>S.cells[j]===null),e=near.length?near:emptyCells();
+    bossBreathe();
+    if(now-bossT>15000&&overlay.hidden){bossT=now;const nb=nbrs(S.boss.cell,BC,N),free=nb.filter(j=>S.cells[j]!==BAD).length,near=free>2?nb.filter(j=>S.cells[j]===null):[],e=near.length?near:emptyCells().filter(j=>!nb.includes(j));
       if(e.length&&S.cells.filter(x=>x===BAD).length<8){const j=pick(e);S.cells[j]=BAD;renderCell(j,true);burstAt(cellsEl[j],10,350);sfx.deny()}}
     shown[S.boss.cell]=undefined;renderCell(S.boss.cell);return}
   if(!th('chill')&&S.bossDay!==today()&&S.best>=4&&now>bossSpawnAt&&overlay.hidden&&!S.orders.some(o=>o.kind==='raid'||o.kind==='troll'))startBoss()},1000);
