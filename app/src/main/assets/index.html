@@ -1182,13 +1182,13 @@ function oState(o,r){const k=OK(o),now=Date.now();if(k==='sing'||k==='wheel')ret
 function ordersKey(){const now=Date.now();return S.orders.map(o=>oState(o,oReady(o))).join('|')+(S.orders.some(o=>(o.kind==='merge'||o.kind==='raid'||o.kind==='troll')&&o.until>now||hasLeft(o)&&o.left!=null)?Math.floor(now/1000):'')}
 function ensureOrders(){const now=Date.now();S.ordPending=(S.ordPending||[]).filter(x=>x>now);const regN=()=>S.orders.filter(o=>o.kind!=='raid'&&o.kind!=='troll').length;while(regN()+S.ordPending.length<3)S.orders.push(newOrder());renderOrders()}
 function hasTier(t){return S.cells.indexOf(t)}
-function renderOrders(){const now=Date.now();$('orders').innerHTML=S.orders.map((o,k)=>{const r=oReady(o);return`<button class="order req${r&&OK(o)!=='troll'?' ready':''}${hasLeft(o)&&o.left!=null&&o.left<30000?' hurry':''}${OK(o)!=='give'?' quest q-'+OK(o):''}" data-k="${k}"><span class="oi">${oIcon(o)}</span><span class="on"><i>${o.user||'viewer'}:</i><span class="rq">${oText(o)}</span></span><span class="dl"></span><span class="or">${o.reward?'+'+fmt(o.reward):'??'}</span><span class="st">${o.chest?'+СУНДУК ':''}${oState(o,r)}</span></button>`}).join('')+(S.ordPending||[]).filter(x=>x>now).map(x=>`<div class="order req wait"><span class="oi"><b class="qi">...</b></span><span class="on"><i>чат:</i><span class="rq">печатает...</span></span><span class="dl"></span><span class="or">${mmss(x-now)}</span><span class="st">[...]</span></div>`).join('')}
+function renderOrders(){const now=Date.now();const rank=o=>{const k=OK(o);return oReady(o)&&k!=='troll'?0:k==='troll'||k==='raid'||o.flash?1:2};$('orders').innerHTML=S.orders.map((o,k)=>[o,k]).sort((a,b)=>rank(a[0])-rank(b[0])||a[1]-b[1]).map(([o,k])=>{const r=oReady(o);return`<button class="order req${r&&OK(o)!=='troll'?' ready':''}${hasLeft(o)&&o.left!=null&&o.left<30000?' hurry':''}${OK(o)!=='give'?' quest q-'+OK(o):''}" data-k="${k}"><span class="oi">${oIcon(o)}</span><span class="on"><i>${o.user||'viewer'}:</i><span class="rq">${oText(o)}</span></span><span class="dl"></span><span class="or">${o.reward?'+'+fmt(o.reward):'??'}</span><span class="st">${o.chest?'+СУНДУК ':''}${oState(o,r)}</span></button>`}).join('')+(S.ordPending||[]).filter(x=>x>now).map(x=>`<div class="order req wait"><span class="oi"><b class="qi">...</b></span><span class="on"><i>чат:</i><span class="rq">печатает...</span></span><span class="dl"></span><span class="or">${mmss(x-now)}</span><span class="st">[...]</span></div>`).join('')}
 const QHINT={merge:'Сделай слияния подряд: на всё 1 минута, таймер стартует с первого',spawn:'Жми НАЙТИ, чтобы получить новые артефакты',event:'Запусти событие из баннера СОБЫТИЕ',shelf:'Открой Комнату и поставь артефакт на полку'};
 function fulfill(k,cell){const o=S.orders[k];if(!o)return;const kd=OK(o);if(kd==='troll'){banTroll(k);return}if(kd==='sing'||kd==='wheel'){S.orders.splice(k,1);(S.ordPending=S.ordPending||[]).push(Date.now()+ORD_CD);renderOrders();if(kd==='sing'){S.singT=Date.now();startKaraoke(o.user)}else{S.wheelDay=today();startWheel(o.user)}save();return}if(kd==='raid'){if(!oReady(o)){toast('Делай слияния, пока рейд не ушёл!');sfx.deny();return}raidWin(k);return}
   if(kd==='give'){if(cell===undefined)cell=hasTier(o.tier);if(cell<0||S.cells[cell]!==o.tier){toast(`Нужен ${NAMES[o.tier]}. Собери его объединением`);sfx.deny();return}}
   else if(kd==='many'){if(cntTier(o.tier)<o.need){toast(`Нужно ${o.need} шт. «${NAMES[o.tier]}» на поле одновременно`);sfx.deny();return}}
   else if(!oReady(o)){toast(QHINT[kd]);sfx.deny();return}
-  const card=$('orders').children[k];if(card){burstAt(card,18,kd==='give'||kd==='many'?HUES[o.tier]:undefined);floatText(card,'+'+fmt(o.reward))}
+  const card=$('orders').querySelector(`[data-k="${k}"]`);if(card){burstAt(card,18,kd==='give'||kd==='many'?HUES[o.tier]:undefined);floatText(card,'+'+fmt(o.reward))}
   if(kd==='give'){S.cells[cell]=null;renderCell(cell)}else if(kd==='many'){let left=o.need;if(cell!==undefined&&S.cells[cell]===o.tier){S.cells[cell]=null;renderCell(cell);left--}for(let i=0;i<N&&left>0;i++)if(S.cells[i]===o.tier){S.cells[i]=null;renderCell(i);left--}}addCoins(o.reward);S.stats.orders++;buddy('order');chat('order',2);logChat(o.user||'viewer',pick(['спасибо!!',kd==='give'?'ура, '+NAMES[o.tier]+'!':'вот это стрим!','лучшая стримерша','<3 <3','держи лайк']),'me');addSubs(Math.random()<.5?2:1);viewers*=1.03;moodBump(3);S.orders.splice(k,1);(S.ordPending=S.ordPending||[]).push(Date.now()+(S.tut<5?3000:th('quiz')?ORD_CD/2:ORD_CD));ensureOrders();sfx.coin();tutEvent('order');goalEv('order');
   if(o.chest)openChest('Сундук за просьбу чата');save()}
 $('orders').addEventListener('click',e=>{const b=e.target.closest('button.order');if(b)fulfill(+b.dataset.k)});
@@ -1287,15 +1287,15 @@ const TIPS=[
  {id:'recipe',when:()=>(S.recHints||[]).length>0&&!recs().length,el:()=>[$('chatlog')],say:'Чат шепчет рецепт! Разные артефакты тоже можно объединять.'},
  {id:'trip',when:()=>S.best>=3&&!S.trip&&!(S.stats.trips>0)&&(S.stats.playMs||0)>240000,el:()=>[$('bface')],say:'Отправь меня на барахолку! ПУСК → Кот-курьер.'},
  {id:'marathon',when:()=>S.best>=3&&!(S.rl&&S.rl.runs)&&(S.stats.playMs||0)>360000,el:()=>[$('startBtn')],say:'Новый режим! ПУСК → Марафон: забег до утра с усилениями.'},
- {id:'quest',when:()=>S.orders.some(o=>OK(o)!=='give'&&OK(o)!=='raid'&&OK(o)!=='troll'),el:()=>[...$('orders').children].filter((c,k)=>S.orders[k]&&OK(S.orders[k])!=='give').slice(0,1),say:'Это задание чата. Выполни и жми ЗАБРАТЬ!'},
+ {id:'quest',when:()=>S.orders.some(o=>OK(o)!=='give'&&OK(o)!=='raid'&&OK(o)!=='troll'),el:()=>[...$('orders').children].filter(c=>{const o=S.orders[+c.dataset.k];return o&&OK(o)!=='give'}).slice(0,1),say:'Это задание чата. Выполни и жми ЗАБРАТЬ!'},
  {id:'mood',when:()=>(S.stats.playMs||0)>90000,el:()=>[$('moodBox')],say:'Сердечки — настроение. Онлайн радует, скука злит. Грустно? Погладь её!'},
  {id:'shop',when:()=>S.best>=3&&S.coins>refIncome()*250,el:()=>[$('shopBtn')],say:'Монет много! В ЛАРЬКЕ есть энергетик и флешки.'},
  {id:'room',when:()=>roomReady(),el:()=>[$('roomBtn')],say:'Поставь артефакт на полку в КОМНАТЕ: наборы дают бонусы.'},
  {id:'goal',when:()=>(S.stats.superchats||0)>=1,el:()=>[$('goalLine')],say:'Суперчаты наполняют сбор на камере. Чат купит технику!'},
  {id:'ward',when:()=>chanLvl()>=1,el:()=>[$('wardBtn')],say:'Новый уровень канала! В ОБРАЗЕ открылись вещи.'},
  {id:'sched',when:()=>(S.stats.playMs||0)>300000&&!sch().set,el:()=>[$('startBtn')],say:'Задай время эфира: ПУСК → Расписание. Зрители ждут!'},
- {id:'mini',when:()=>S.orders.some(o=>o.kind==='sing'||o.kind==='wheel'),el:()=>[...$('orders').children].filter((c,k)=>S.orders[k]&&(S.orders[k].kind==='sing'||S.orders[k].kind==='wheel')).slice(0,1),say:'Чат зовёт поиграть! Жми ИГРАТЬ.'},
- {id:'raid',when:()=>S.orders.some(o=>o.kind==='raid'),el:()=>[...$('orders').children].slice(0,1),say:'Рейд! Быстро делай слияния, пока таймер тикает!'},
+ {id:'mini',when:()=>S.orders.some(o=>o.kind==='sing'||o.kind==='wheel'),el:()=>[...$('orders').children].filter(c=>{const o=S.orders[+c.dataset.k];return o&&(o.kind==='sing'||o.kind==='wheel')}).slice(0,1),say:'Чат зовёт поиграть! Жми ИГРАТЬ.'},
+ {id:'raid',when:()=>S.orders.some(o=>o.kind==='raid'),el:()=>[...$('orders').children].filter(c=>{const o=S.orders[+c.dataset.k];return o&&o.kind==='raid'}).slice(0,1),say:'Рейд! Быстро делай слияния, пока таймер тикает!'},
  {id:'troll',when:()=>S.orders.some(o=>o.kind==='troll'),el:()=>[$('bface')],say:'Тролль! Тыкни меня — я его забаню!'}];
 let tipT=0,tipOn=null;
 setInterval(()=>{if(S.tut<5||!streamOn||!overlay.hidden||E||rlActive||document.hidden)return;const tips=S.tips||(S.tips={}),now=Date.now();
@@ -1649,13 +1649,13 @@ function startRaid(){const who=pick(RAIDERS),n=Math.round(viewers*(1+Math.random
   for(let i=0;i<8;i++)setTimeout(()=>chatSpawn(pick(['РЕЙД!!!','привет от '+who,'мы с рейда','покажи слияния!','кто тут главный?','<3 рейд']),Math.random()<.5,pick(REQ_NAMES)),300+i*260);
   typeLine(`Рейд от ${who}! Быстро ${need} слияний! `+smiles(1),'wow')}
 function raidWin(k){const o=S.orders[k];S.orders.splice(k,1);addCoins(o.reward);addSubs(Math.max(10,Math.round(o.raiders*.08)));moodBump(12);S.stats.raids=(S.stats.raids||0)+1;
-  const card=$('orders').children[k];if(card){burstAt(card,26);floatText(card,'+'+fmt(o.reward))}sfx.fanfare();cutin('РЕЙД ДОВОЛЕН!',`+${fmtInt(Math.max(10,Math.round(o.raiders*.08)))} подписчиков`,'neko');
+  const card=$('orders').querySelector(`[data-k="${k}"]`);if(card){burstAt(card,26);floatText(card,'+'+fmt(o.reward))}sfx.fanfare();cutin('РЕЙД ДОВОЛЕН!',`+${fmtInt(Math.max(10,Math.round(o.raiders*.08)))} подписчиков`,'neko');
   logChat(o.user,'остаёмся! подписались!','me');renderOrders();save()}
 function startTroll(){const who=pick(TROLLS);S.orders.unshift({kind:'troll',user:who,text:pick(TROLL_TXT),until:Date.now()+10000,reward:Math.round(refIncome()*30)});renderOrders();
   for(let i=0;i<4;i++)setTimeout(()=>chatSpawn(pick(TROLL_TXT),true,who),i*500);setFace('angry',false,true);
   typeLine('Тролль в чате! Тыкни меня или БАН! '+smiles(1),'angry',true);sfx.deny()}
 function banTroll(k){const o=S.orders[k];if(!o||o.kind!=='troll')return;S.orders.splice(k,1);addCoins(o.reward);moodBump(5);S.stats.bans=(S.stats.bans||0)+1;goalEv('ban');
-  const card=$('orders').children[k];if(card){burstAt(card,20);floatText(card,'БАН!')}sfx.coin();shake();
+  const card=$('orders').querySelector(`[data-k="${k}"]`);if(card){burstAt(card,20);floatText(card,'БАН!')}sfx.coin();shake();
   typeLine(`${o.user} забанен! `+smiles(1),'cool',true);spamFrom($('bface'),3);
   for(let i=0;i<3;i++)setTimeout(()=>logChat(pick(REQ_NAMES),pick(['кот-модератор топ','БАН!!!','так ему','спасибо, кот','F тролль']),'me'),300+i*400);renderOrders();save()}
 function missOrder(o){viewers*=.93;moodBump(-6);S.stats.missed=(S.stats.missed||0)+1;(S.ordPending=S.ordPending||[]).push(Date.now()+ORD_CD);
