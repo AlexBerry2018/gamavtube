@@ -718,6 +718,17 @@ html.vert[data-ph] .sbar{margin:0}
 .goals{display:flex;flex-direction:column;gap:6px;margin:8px 0}
 .goal{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;padding:6px 8px;border:2px solid var(--ph);font-size:.72rem}
 .goal.done{background:var(--ph);color:#fff}
+
+.coinfly{position:fixed;z-index:67;pointer-events:none;font:700 .8rem var(--mono);color:var(--red);text-shadow:1px 1px 0 #fff;transform:translate(-50%,-50%);transition:left .55s cubic-bezier(.5,-.3,.7,1),top .55s cubic-bezier(.3,.6,.6,1),opacity .55s}
+#coins.bump,.lcd.bump{animation:cbump .25s steps(2)}
+@keyframes cbump{50%{transform:scale(1.12)}}
+.boardp.bshake{animation:bshake .32s steps(4)}
+@keyframes bshake{25%{transform:translate(-4px,2px) rotate(-.4deg)}50%{transform:translate(4px,-2px) rotate(.4deg)}75%{transform:translate(-2px,-1px)}}
+.boardp.bshake.big{animation-duration:.5s}
+.cell.pop .gem{animation:gempop .32s cubic-bezier(.3,1.8,.5,1)}
+@keyframes gempop{0%{transform:scale(.3) rotate(-12deg)}100%{transform:scale(1)}}
+.avatar.react{animation:areact .5s steps(4)}
+@keyframes areact{25%{transform:translateY(-4px)}75%{transform:translateY(2px)}}
 </style>
 <script>/* мост к Android: вибрация через нативный API */
 if(window.AndroidApp){navigator.vibrate=function(p){try{AndroidApp.vibrate(JSON.stringify(Array.isArray(p)?p:[p]))}catch(e){}return true}}</script>
@@ -1101,6 +1112,9 @@ const sfx={
   deny(){tone(220,.09,'square',.04);tone(196,.12,'square',.04,.12)},
   cut(){noise(.3,.18,900,.7,0,'bandpass');tone(note(84),.08,'square',.035,.12);tone(note(96),.18,'square',.04,.2)},
   tick(){tone(1200,.04,'square',.035)},
+  combo(n){const b=72+Math.min(n,12)*2;[0,4,7,12].forEach((m,i)=>tone(note(b+m)*jit(),.05,'square',.03,i*.035));if(n>=5)noise(.08,.08,6000,.8,.12,'highpass')},
+  gold(){[96,100,103,108,103,108,112].forEach((n,i)=>{tone(note(n),.14,'triangle',.045,i*.05);tone(note(n+12),.08,'sine',.02,i*.05+.02)})},
+  alarm(){for(let i=0;i<3;i++){tone(880,.12,'square',.035,i*.26,1320);tone(1320,.12,'square',.03,i*.26+.13,880)}},
   flip(){noise(.035,.35,3200,.8,0,'highpass');noise(.03,.25,1800,1.2,.05);tone(note(84),.06,'square',.03,.12);tone(note(88),.06,'square',.03,.19);tone(note(91),.1,'square',.03,.26)},
   modem(){['0','8','0','0'].forEach((k,i)=>{const d=DTMF[k];tone(d[0],.07,'sine',.05,i*.09);tone(d[1],.07,'sine',.05,i*.09)});
     const t0=.45;tone(2100,.35,'sine',.03,t0);noise(.4,.12,1800,2,t0+.35);for(let i=0;i<6;i++)tone(i%2?1850:1650,.06,'square',.02,t0+.4+i*.06);noise(.25,.1,900,1,t0+.75);tone(980,.2,'square',.02,t0+.8,1400)}};
@@ -1147,7 +1161,7 @@ function spawn(paid){if(!emptyCells().length){if(paid){toast('Память за�
   if(paid){const c=spawnCost();if(S.coins<c)return false;S.coins-=c;S.bought++;S.spN=(S.spN||0)+1}
   place(roll());S.stats.spawns++;sfx.spawn();if(paid)questProg('spawn');return true}
 
-function discover(t,el){if(t<=S.best)return;S.best=t;if(t>S.codex)S.codex=t;const r=refIncome()*20+income(t)*30;addCoins(r);toast(`Новый артефакт: ${NAMES[t]}! +${fmt(r)}`);
+function discover(t,el){if(t<=S.best)return;S.best=t;react('best',t);if(t>S.codex)S.codex=t;const r=refIncome()*20+income(t)*30;addCoins(r);toast(`Новый артефакт: ${NAMES[t]}! +${fmt(r)}`);
   sfx.fanfare();shake();bigFx(t,true);if(el)burstAt(el,40,undefined,1.6);buddy('newItem',{n:NAMES[t]},true);addSubs(15*t);moodBump(6);chat('newItem',9,{n:NAMES[t]});viewers*=1.08;
   if(t===ERA2){cutin('ЭПОХА 2005!','открыта новая коллекция','neko');for(let i=0;i<6;i++)setTimeout(()=>chatSpawn(pick(['2005!!!','олды плачут','эмо-время','флешки!!','новая эра','MySpace?']),true),400+i*300);setTimeout(()=>toast('Новая эпоха: находки теперь стартуют ближе к лучшему артефакту'),2600)}
   else if(t>=3)cutin(pick(['ВАУ!!','ЛЕГЕНДА!','OMG!!','МОЩНО!','ЕСТЬ!!']),NAMES[t],t%2?'eyes':'neko');
@@ -1189,7 +1203,7 @@ function fulfill(k,cell){const o=S.orders[k];if(!o)return;const kd=OK(o);if(kd==
   else if(kd==='many'){if(cntTier(o.tier)<o.need){toast(`Нужно ${o.need} шт. «${NAMES[o.tier]}» на поле одновременно`);sfx.deny();return}}
   else if(!oReady(o)){toast(QHINT[kd]);sfx.deny();return}
   const card=$('orders').querySelector(`[data-k="${k}"]`);if(card){burstAt(card,18,kd==='give'||kd==='many'?HUES[o.tier]:undefined);floatText(card,'+'+fmt(o.reward))}
-  if(kd==='give'){S.cells[cell]=null;renderCell(cell)}else if(kd==='many'){let left=o.need;if(cell!==undefined&&S.cells[cell]===o.tier){S.cells[cell]=null;renderCell(cell);left--}for(let i=0;i<N&&left>0;i++)if(S.cells[i]===o.tier){S.cells[i]=null;renderCell(i);left--}}addCoins(o.reward);S.stats.orders++;buddy('order');chat('order',2);logChat(o.user||'viewer',pick(['спасибо!!',kd==='give'?'ура, '+NAMES[o.tier]+'!':'вот это стрим!','лучшая стримерша','<3 <3','держи лайк']),'me');addSubs(Math.random()<.5?2:1);viewers*=1.03;moodBump(3);S.orders.splice(k,1);(S.ordPending=S.ordPending||[]).push(Date.now()+(S.tut<5?3000:th('quiz')?ORD_CD/2:ORD_CD));ensureOrders();sfx.coin();tutEvent('order');goalEv('order');
+  if(kd==='give'){S.cells[cell]=null;renderCell(cell)}else if(kd==='many'){let left=o.need;if(cell!==undefined&&S.cells[cell]===o.tier){S.cells[cell]=null;renderCell(cell);left--}for(let i=0;i<N&&left>0;i++)if(S.cells[i]===o.tier){S.cells[i]=null;renderCell(i);left--}}addCoins(o.reward);S.stats.orders++;buddy('order');chat('order',2);logChat(o.user||'viewer',pick(['спасибо!!',kd==='give'?'ура, '+NAMES[o.tier]+'!':'вот это стрим!','лучшая стримерша','<3 <3','держи лайк']),'me');addSubs(Math.random()<.5?2:1);viewers*=1.03;moodBump(3);S.orders.splice(k,1);(S.ordPending=S.ordPending||[]).push(Date.now()+(S.tut<5?3000:th('quiz')?ORD_CD/2:ORD_CD));ensureOrders();sfx.coin();tutEvent('order');goalEv('order');if(o.flash)react('flashOk');coinFly($('orders'),6);
   if(o.chest)openChest('Сундук за просьбу чата');save()}
 $('orders').addEventListener('click',e=>{const b=e.target.closest('button.order');if(b)fulfill(+b.dataset.k)});
 
@@ -1464,6 +1478,7 @@ function showMenu(){const g=dustGain(),can=canPrestige();
   <div class="toggle"><span>Комментарии поверх экрана</span><button class="${S.chat?'on':''}" id="chatBtn">${S.chat?'Включён':'Выключен'}</button></div>
   <div class="toggle"><span>Реплики кота-помощника</span><button class="${S.buddy?'on':''}" id="budBtn">${S.buddy?'Включён':'Выключен'}</button></div>
   <div class="toggle"><span>Вибрация</span><button class="${S.vib!==false?'on':''}" id="vibBtn">${S.vib!==false?'Включена':'Выключена'}</button></div>
+  <div class="toggle"><span>Музыка</span><button class="${S.music!==false?'on':''}" id="musBtn">${S.music!==false?'Включена':'Выключена'}</button></div>
   <div class="toggle"><span>Звук</span><button class="gel ${S.muted?'':'on'}" id="sndBtn">${S.muted?'Выключен':'Включён'}</button></div>
   <h3>Коллекция</h3><div class="codex">${codex}</div>
   <h3>Рецепты ${recs().length}/${RECIPES.length}</h3><div class="slist">${RECIPES.map((r,i)=>recs().includes(i)?`<div class="sitem"><pre></pre><div><b>${r.name}</b><span>${NAMES[r.a]} + ${NAMES[r.b]}</span></div><div class="recpic">${gemSVG(REC0+i)}</div></div>`:`<div class="sitem"><pre>?</pre><div><b>???</b><span>${(S.recHints||[]).includes(i)?`${NAMES[r.a]} + ???`:'секретное сочетание'}</span></div><div class="recpic"></div></div>`).join('')}</div>
@@ -1475,7 +1490,8 @@ function showMenu(){const g=dustGain(),can=canPrestige();
   $('chatBtn').onclick=e=>{S.chat=!S.chat;e.currentTarget.classList.toggle('on',S.chat);e.currentTarget.textContent=S.chat?'Включён':'Выключен';applyChat();save()};
   $('budBtn').onclick=e=>{S.buddy=!S.buddy;e.currentTarget.classList.toggle('on',S.buddy);e.currentTarget.textContent=S.buddy?'Включён':'Выключен';applyBuddy();save();if(S.buddy)setTimeout(()=>buddy('welcome',null,true),300)};
   $('vibBtn').onclick=e=>{S.vib=S.vib===false;e.currentTarget.classList.toggle('on',S.vib);e.currentTarget.textContent=S.vib?'Включена':'Выключена';vib(40);save()};
-  $('sndBtn').onclick=e=>{S.muted=!S.muted;e.currentTarget.classList.toggle('on',!S.muted);e.currentTarget.textContent=S.muted?'Выключен':'Включён';if(!S.muted)sfx.coin();save()};
+  $('musBtn').onclick=e=>{S.music=S.music===false;e.currentTarget.classList.toggle('on',S.music);e.currentTarget.textContent=S.music?'Включена':'Выключена';save();musicSync()};
+  $('sndBtn').onclick=e=>{S.muted=!S.muted;e.currentTarget.classList.toggle('on',!S.muted);e.currentTarget.textContent=S.muted?'Выключен':'Включён';if(!S.muted)sfx.coin();save();musicSync()};
   $('prBtn').onclick=e=>{if(!canPrestige())return;if(!e.target.dataset.sure){e.target.dataset.sure=1;e.target.textContent=`Да, перезагрузить за +${g}`;return}
     S.dust+=g;S.stats.prestiges++;Object.assign(S,freshRun());S.qual=Math.floor(S.dust*START_K);shown=Array(N).fill(undefined);renderBoard();ensureOrders();closeSheet();toast(`Перерождение! Ты в новом гаджете: доход +${Math.round(S.dust*DUST_BONUS*100)}% навсегда`);cutin('ПЕРЕРОЖДЕНИЕ!!','новый гаджет','eyes');sfx.fanfare();burst(innerWidth/2,innerHeight/2,60,undefined,2);save()};
   $('resetBtn').onclick=e=>{if(e.target.dataset.sure){const m=S.muted,sk=S.skin;S=fresh();S.muted=m;S.skin=sk;shown=Array(N).fill(undefined);renderBoard();ensureOrders();closeSheet();updateDots();toast('Прогресс стёрт');save()}else{e.target.dataset.sure=1;e.target.textContent='Точно стереть?'}}}
@@ -1645,7 +1661,7 @@ const TROLL_TXT=['ваш стрим отстой','скучно, уходите 
 let streamEvT=Date.now()+5*60000;
 function startRaid(){const who=pick(RAIDERS),n=Math.round(viewers*(1+Math.random())+50),need=pick([5,6,8]);
   S.orders.unshift({kind:'raid',user:who,need,n:0,until:Date.now()+60000,reward:Math.round(refIncome()*80),raiders:n});renderOrders();
-  cutin('РЕЙД!!',`${who} привёл ${fmtInt(n)} зрителей`,'eyes');sfx.fanfare();viewers+=n;moodBump(8);
+  cutin('РЕЙД!!',`${who} привёл ${fmtInt(n)} зрителей`,'eyes');sfx.fanfare();musicHype(60000);viewers+=n;moodBump(8);
   for(let i=0;i<8;i++)setTimeout(()=>chatSpawn(pick(['РЕЙД!!!','привет от '+who,'мы с рейда','покажи слияния!','кто тут главный?','<3 рейд']),Math.random()<.5,pick(REQ_NAMES)),300+i*260);
   typeLine(`Рейд от ${who}! Быстро ${need} слияний! `+smiles(1),'wow')}
 function raidWin(k){const o=S.orders[k];S.orders.splice(k,1);addCoins(o.reward);addSubs(Math.max(10,Math.round(o.raiders*.08)));moodBump(12);S.stats.raids=(S.stats.raids||0)+1;
@@ -1658,16 +1674,16 @@ function banTroll(k){const o=S.orders[k];if(!o||o.kind!=='troll')return;S.orders
   const card=$('orders').querySelector(`[data-k="${k}"]`);if(card){burstAt(card,20);floatText(card,'БАН!')}sfx.coin();shake();
   typeLine(`${o.user} забанен! `+smiles(1),'cool',true);spamFrom($('bface'),3);
   for(let i=0;i<3;i++)setTimeout(()=>logChat(pick(REQ_NAMES),pick(['кот-модератор топ','БАН!!!','так ему','спасибо, кот','F тролль']),'me'),300+i*400);renderOrders();save()}
-function missOrder(o){viewers*=.93;moodBump(-6);S.stats.missed=(S.stats.missed||0)+1;(S.ordPending=S.ordPending||[]).push(Date.now()+ORD_CD);
+function missOrder(o){react(o.flash?'flashFail':'miss');viewers*=.93;moodBump(-6);S.stats.missed=(S.stats.missed||0)+1;(S.ordPending=S.ordPending||[]).push(Date.now()+ORD_CD);
   logChat(o.user||'viewer',pick(['ну и ладно, пока','не дождался...','скучно, ушёл','игнор? понятно']),'hot');toast(`${o.user||'Зритель'} не дождался и ушёл: зрители −7%`);sfx.deny();save()}
 function trollHit(o){const e=emptyCells();let what='';
   const st=Math.min(S.coins*.08,refIncome()*90);S.coins-=st;what=`украл ◈${fmt(st)}`;if(e.length&&Math.random()<.7){const i=pick(e);S.cells[i]=BAD;renderCell(i,true);what+=' и сломал клетку'}
-  viewers*=.95;moodBump(-12);toast(`${o.user} ${what}. Бань быстрее!`);logChat(o.user,'ахаха, лох','hot');sfx.deny();shake()}
+  viewers*=.95;moodBump(-12);react('troll');toast(`${o.user} ${what}. Бань быстрее!`);logChat(o.user,'ахаха, лох','hot');sfx.deny();shake()}
 setInterval(()=>{if(!streamOn||S.tut<5||E||rlActive||document.hidden)return;const now=Date.now();
   let ch=false;for(let k=S.orders.length-1;k>=0;k--){const o=S.orders[k];
     if(hasLeft(o)&&overlay.hidden&&!tourOn){if(o.left==null)o.left=PATIENCE();o.left-=th('chill')?500:1000;if(o.left<=0){S.orders.splice(k,1);missOrder(o);ch=true;continue}}
     if(o.kind==='troll'&&o.until<=now){S.orders.splice(k,1);trollHit(o);ch=true}
-    else if(o.kind==='raid'&&o.until<=now&&o.n<o.need){S.orders.splice(k,1);logChat(o.user,pick(['скучно, уходим','ну и ладно','пока!']),'hot');viewers*=.8;moodBump(-10);toast('Рейд ушёл, не дождавшись: зрители −20%');ch=true}}
+    else if(o.kind==='raid'&&o.until<=now&&o.n<o.need){S.orders.splice(k,1);logChat(o.user,pick(['скучно, уходим','ну и ладно','пока!']),'hot');react('raidFail');viewers*=.8;moodBump(-10);toast('Рейд ушёл, не дождавшись: зрители −20%');ch=true}}
   if(ch){renderOrders();ensureOrders()}
   if(th('chill')||!overlay.hidden||now<streamEvT||S.orders.some(o=>o.kind==='raid'||o.kind==='troll'))return;
   streamEvT=now+(2.5+Math.random()*2.5)*60000;if(S.best<3)return;
@@ -2193,9 +2209,10 @@ window.K2DBG={
 const hy={c:0,t:0};
 function hyLabel(){return hy.c>=3&&Date.now()-hy.t<2600?`КОМБО ×${hy.c} · `:''}
 function hypeMerge(i,res){const now=Date.now();hy.c=now-hy.t<2600?hy.c+1:1;hy.t=now;
+  coinFly(cellsEl[i],hy.c>=3?Math.min(8,hy.c):1);if(hy.c>=2)sfx.combo(hy.c);if(hy.c>=5)boardShake(hy.c);if(hy.c===10)react('combo10');
   if(hy.c>=3){const b=refIncome()*hy.c*1.5;addCoins(b);floatText(cellsEl[i],`КОМБО ×${hy.c} +${fmt(b)}`);if(hy.c===5||hy.c===10||hy.c===15){cutin(`КОМБО ×${hy.c}!`,'чат в восторге','eyes');moodBump(4);chat('combo',3)}}
   goalEv('combo',hy.c);if(res)goalEv('tier',res);
-  if(gold&&gold.i===i&&Date.now()<gold.until){const g=Math.max(refIncome()*45,income(Math.max(0,res-1))*mult()*90);addCoins(g);floatText(cellsEl[i],'ЗОЛОТО +'+fmt(g));burstAt(cellsEl[i],30,48);sfx.fanfare();toast('Золотая клетка! +'+fmt(g));goalEv('gold');goldOff()}}
+  if(gold&&gold.i===i&&Date.now()<gold.until){const g=Math.max(refIncome()*45,income(Math.max(0,res-1))*mult()*90);addCoins(g);floatText(cellsEl[i],'ЗОЛОТО +'+fmt(g));burstAt(cellsEl[i],30,48);sfx.gold();coinFly(cellsEl[i],10);react('gold');toast('Золотая клетка! +'+fmt(g));goalEv('gold');goldOff()}}
 let gold=null,goldNext=Date.now()+40000;
 function goldOff(){if(gold&&cellsEl[gold.i])cellsEl[gold.i].classList.remove('gold');gold=null;goldNext=Date.now()+(35+Math.random()*35)*1000}
 function goldTick(){const now=Date.now();if(gold){if(now>gold.until){goldOff()}return}if(now<goldNext)return;
@@ -2210,7 +2227,7 @@ function goalEv(kind,v){if(!S.goals||S.tut<5)return;let ch=false;
   S.goals.forEach((g,ix)=>{if(g.done||g.k!==kind)return;if(GOAL_T[kind].max){if(v>g.n){g.n=Math.min(g.need,v);ch=true}}else{g.n++;ch=true}
     if(g.n>=g.need){g.done=true;const r=refIncome()*90;addCoins(r);addSubs(4);sfx.chest();toast(`Цель эфира выполнена: ${GOAL_T[kind].t(g.need)} · +${fmt(r)}`)}});
   if(!ch)return;if(S.goals.every(g=>g.done)){const r=refIncome()*400;addCoins(r);addSubs(20);moodBump(15);S.goalsLv=(S.goalsLv||0)+1;
-    cutin('ВСЕ ЦЕЛИ!',`+${fmt(r)} и новые цели`,'neko');sfx.fanfare();for(let i=0;i<5;i++)setTimeout(()=>chatSpawn(pick(['ЛЕГЕНДА','GG','топ стрим','8888']),true),200+i*250);setTimeout(newGoals,1500)}
+    cutin('ВСЕ ЦЕЛИ!',`+${fmt(r)} и новые цели`,'neko');sfx.fanfare();react('goals');coinFly($('goalsBar'),12);for(let i=0;i<5;i++)setTimeout(()=>chatSpawn(pick(['ЛЕГЕНДА','GG','топ стрим','8888']),true),200+i*250);setTimeout(newGoals,1500)}
   renderGoals()}
 function renderGoals(){const el=$('goalsBar');if(!el)return;if(!S.goals||S.tut<5){el.textContent='';return}
   el.innerHTML='ЦЕЛИ: '+S.goals.map(g=>g.done?`<u>✓ ${GOAL_T[g.k].t(g.need)}</u>`:`${GOAL_T[g.k].t(g.need)}${g.k==='tier'?'':` <b>${g.n}/${g.need}</b>`}`).join(' <i>·</i> ')}
@@ -2220,11 +2237,57 @@ function showGoals(){if(!S.goals)newGoals();openSheet(`<h2>Цели эфира</
 $('sbar').addEventListener('click',()=>{if(S.tut>=5)showGoals()});
 function startFlash(){const hi=Math.max(0,S.best-1),lo=Math.max(0,S.best-3),tier=lo+Math.floor(Math.random()*(hi-lo+1)),user=pick(REQ_NAMES);
   S.orders.unshift({kind:'give',tier,user,verb:'СРОЧНО',flash:true,left:45000,reward:Math.round((income(tier)*ORD_K*mult()+refIncome()*20)*2)});renderOrders();
-  cutin('СРОЧНО!',`${user} ждёт ${NAMES[tier]} 45 секунд`,'eyes');sfx.fanfare();for(let i=0;i<3;i++)setTimeout(()=>chatSpawn(pick(['быстрее!!','успеет?','45 сек!!','давай-давай']),Math.random()<.5),200+i*300)}
+  cutin('СРОЧНО!',`${user} ждёт ${NAMES[tier]} 45 секунд`,'eyes');sfx.alarm();react('flash');for(let i=0;i<3;i++)setTimeout(()=>chatSpawn(pick(['быстрее!!','успеет?','45 сек!!','давай-давай']),Math.random()<.5),200+i*300)}
 function startDdos(){const e=emptyCells();let k=0;for(let n=0;n<3&&e.length&&S.cells.filter(t=>t===BAD).length<8;n++){const j=e.splice(Math.floor(Math.random()*e.length),1)[0];S.cells[j]=BAD;renderCell(j,true);k++}
-  if(!k)return;cutin('DDOS-АТАКА!',`${k} сектора повреждены`,'shock');shake();sfx.deny();moodBump(-5);toast('DDoS! Сливай артефакты рядом с битыми секторами')}
+  if(!k)return;react('ddos');sfx.alarm();cutin('DDOS-АТАКА!',`${k} сектора повреждены`,'shock');shake();sfx.deny();moodBump(-5);toast('DDoS! Сливай артефакты рядом с битыми секторами')}
 setInterval(()=>{if(!streamOn||S.tut<5||E||rlActive||document.hidden||!overlay.hidden||tourOn)return;if(!S.goals)newGoals();goldTick()},1000);
 renderGoals();
+
+/* ---------- сочность: монеты летят в счётчик, тряска поля ---------- */
+let flyN=0;
+function coinFly(fromEl,n){if(REDUCED||!fromEl||flyN>24)return;const to=$('coins');if(!to)return;const a=fromEl.getBoundingClientRect(),b=to.getBoundingClientRect();if(!b.width)return;
+  for(let k=0;k<n;k++){const d=document.createElement('div');d.className='coinfly';d.textContent='◈';const x=a.left+a.width/2+(Math.random()-.5)*a.width*.6,y=a.top+a.height/2+(Math.random()-.5)*a.height*.6;
+    d.style.left=x+'px';d.style.top=y+'px';document.body.appendChild(d);flyN++;
+    setTimeout(()=>{d.style.left=b.left+b.width*.3+'px';d.style.top=b.top+b.height/2+'px';d.style.opacity='.3'},20+k*45);
+    setTimeout(()=>{d.remove();flyN--;to.classList.remove('bump');void to.offsetWidth;to.classList.add('bump');if(k%3===0)tone(2730+k*60,.03,'square',.015)},600+k*45)}}
+function boardShake(n){if(REDUCED)return;const b=document.querySelector('.boardp');b.classList.remove('bshake','big');void b.offsetWidth;b.classList.add('bshake');if(n>=10)b.classList.add('big');if(n>=8)vib(30)}
+/* ---------- реакции стримерши ---------- */
+const REACT={
+ best:{f:'wow',l:['ЧТО?! Новый артефакт: {n}!','Чат, смотрите! {n}!!','Я сама не верю... {n}!'],e:'(ﾟoﾟ)'},
+ combo10:{f:'party',l:['КОМБО ×10!! Вы это видели?!','Пальцы горят! ×10!','Я в потоке, не мешайте!'],e:'\\(^o^)/'},
+ flash:{f:'wow',l:['Срочно? Ща-ща-ща!','45 секунд? Изи. Наверное...','Ааа, где он?!'],e:'(°o°;)'},
+ flashOk:{f:'cool',l:['Успела! Кто сомневался?','Ровно в срок, как всегда B-)','Срочная доставка от стримерши!'],e:'(⌐■_■)'},
+ flashFail:{f:'sad',l:['Не успела... прости!','Ну почему так быстро...','Чат, я старалась (T_T)'],e:'(T_T)'},
+ miss:{f:'sad',l:['Ой, я пропустила просьбу...','Он ушёл? Простите!','Надо быть внимательнее...'],e:'(._.)'},
+ raidFail:{f:'sad',l:['Рейд ушёл... ну и ладно (T_T)','Они даже не попрощались','Следующий рейд будет нашим!'],e:'(╥_╥)'},
+ troll:{f:'angry',l:['Эй! Это мой стрим!','Тролль, ты забанен. Морально.','Котик, где модерация?!'],e:'(╬ Ò﹏Ó)'},
+ ddos:{f:'angry',l:['DDoS?! Кто это делает?!','Сервер, держись!','Я чиню, я чиню!'],e:'(ノಠ益ಠ)ノ'},
+ gold:{f:'love',l:['Золото! Обожаю!','Блестит, как мой стразик ✧','Чат, мы богаты!'],e:'(✧ω✧)'},
+ goals:{f:'party',l:['Все цели эфира! Вы лучшие!','Миссия выполнена, чат!','Это был великий стрим!'],e:'ヽ(•‿•)ノ'}};
+let reactT=0;
+function react(key,t){if(S.tut<5||rlActive)return;const r=REACT[key];if(!r)return;const now=Date.now();if(now-reactT<3500&&key!=='best'&&key!=='goals')return;reactT=now;
+  const line=pick(r.l).replace('{n}',t!=null?NAMES[t]:'');const av=$('avatar');av.classList.remove('react');void av.offsetWidth;av.classList.add('react');floatText(av,r.e);
+  if(S.buddy){budLast=now;typeLine(line,r.f)}else{setFace(r.f);setTimeout(()=>setFace('idle'),2500)}
+  if(Math.random()<.6)setTimeout(()=>logChat(pick(REQ_NAMES),pick(r.f==='sad'?['F','держись','не грусти!','<3']:r.f==='angry'?['бан!!','модеры где','кот, фас']:['ВАУ','8888','топ','PogChamp']),'me'),500)}
+/* ---------- музыка: чиптюн 2000-х ---------- */
+const MUS={on:false,gain:null,next:0,step:0,timer:null,hypeUntil:0,bar:0};
+const PROG=[[57,60,64],[53,57,60],[48,52,55],[55,59,62]];   // Am F C G
+const LEAD=[[76,0,74,72,0,72,74,76,0,79,0,76,74,0,72,0],[72,0,69,0,72,74,0,72,69,0,67,69,0,0,72,0],[67,0,72,0,76,0,74,72,0,74,76,0,79,0,76,0],[74,0,71,74,0,79,0,78,79,0,74,0,71,0,74,0]];
+function musicHype(ms){MUS.hypeUntil=Date.now()+ms}
+function mtone(f,t,d,type,vol){const a=AC;const o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.setValueAtTime(f,t);g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(vol,t+.005);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(MUS.gain);o.start(t);o.stop(t+d+.02)}
+function mnoise(t,d,vol){const a=AC;if(!NOISE)return;const src=a.createBufferSource(),f=a.createBiquadFilter(),g=a.createGain();src.buffer=NOISE;f.type='highpass';f.frequency.value=7000;g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);src.connect(f);f.connect(g);g.connect(MUS.gain);src.start(t,Math.random()*.5);src.stop(t+d+.02)}
+function musicTick(){const a=live();if(!a||!MUS.on)return;if(!NOISE)noise(.01,.0001,1000);
+  const hype=Date.now()<MUS.hypeUntil||hy.c>=5&&Date.now()-hy.t<2600||S.orders.some(o=>o.kind==='raid'||o.flash),bpm=hype?150:112,st=60/bpm/4;
+  if(MUS.next<a.currentTime)MUS.next=a.currentTime+.05;
+  while(MUS.next<a.currentTime+.25){const t=MUS.next,i=MUS.step%16,ch=PROG[Math.floor(MUS.step/16)%4],li=Math.floor(MUS.step/16)%4;
+    if(i%4===0)mtone(note(ch[0]-24),t,st*3.2,'triangle',.11);if(i%4===2)mtone(note(ch[0]-12),t,st*1.5,'triangle',.06);
+    mtone(note(ch[i%3]+12),t,st*.8,'square',.012);
+    const ln=LEAD[li][i];if(ln&&(MUS.bar%2===1||hype))mtone(note(ln),t,st*1.7,'square',.022);
+    if(i%2===0)mnoise(t,.03,hype?.05:.025);if(hype&&i%8===4)mnoise(t,.12,.07);
+    MUS.next+=st;MUS.step++;if(MUS.step%64===0)MUS.bar++}}
+function musicSync(){const want=S.music!==false&&!S.muted&&streamOn&&!document.hidden;if(want&&!MUS.on){const a=ac();if(!a)return;if(!MUS.gain){MUS.gain=a.createGain();MUS.gain.gain.value=.55;MUS.gain.connect(MASTER)}MUS.on=true;MUS.next=0;if(!MUS.timer)MUS.timer=setInterval(musicTick,90)}
+  else if(!want&&MUS.on){MUS.on=false}}
+setInterval(musicSync,1000);document.addEventListener('visibilitychange',musicSync);
 </script>
 
 </body></html>
