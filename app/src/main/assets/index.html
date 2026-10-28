@@ -823,11 +823,11 @@ html.vert[data-ph] .lcdbox>#resTtl.train{display:block;flex-basis:100%;margin:-3
 .grade.gS{color:#e0a100;border-color:#e0a100}.grade.gA{color:var(--red);border-color:var(--red)}.grade.gD{opacity:.6}
 .btn.endst{margin-top:6px;width:100%;font-size:.7rem}
 /* экранные эффекты */
-#fxLayer{position:fixed;inset:0;z-index:90;pointer-events:none}
+#fxLayer{position:fixed;inset:0;z-index:90;pointer-events:none;will-change:transform;contain:strict}
 html[data-fx="vhs"] #fxLayer{background:repeating-linear-gradient(0deg,rgba(0,0,0,.06) 0 1px,transparent 1px 3px);animation:vhsj 6s steps(30) infinite}
-html[data-fx="vhs"] #fxLayer::after{content:"";position:absolute;left:0;right:0;height:14px;background:linear-gradient(rgba(255,255,255,.0),rgba(255,255,255,.25),rgba(255,255,255,0));animation:vhsb 7s linear infinite}
-html[data-fx="vhs"] .crt{filter:saturate(1.15) contrast(1.05);text-shadow:1px 0 rgba(255,0,80,.25),-1px 0 rgba(0,140,255,.25)}
-@keyframes vhsb{0%{top:-20px}100%{top:110%}}
+html[data-fx="vhs"] #fxLayer::after{content:"";position:absolute;left:0;right:0;height:14px;background:linear-gradient(rgba(255,255,255,.0),rgba(255,255,255,.25),rgba(255,255,255,0));top:0;will-change:transform;animation:vhsb 7s linear infinite}
+html[data-fx="vhs"] .crt{text-shadow:1px 0 rgba(255,0,80,.25),-1px 0 rgba(0,140,255,.25)}
+@keyframes vhsb{0%{transform:translateY(-20px)}100%{transform:translateY(110vh)}}
 @keyframes vhsj{0%,96%{transform:none}97%{transform:translateX(2px)}98%{transform:translateX(-2px)}}
 html[data-fx="crt"] #fxLayer{background:repeating-linear-gradient(0deg,rgba(0,0,0,.09) 0 1px,transparent 1px 2px),radial-gradient(ellipse at center,transparent 60%,rgba(0,0,0,.35) 100%);animation:crtf 4s steps(2) infinite}
 @keyframes crtf{50%{opacity:.85}}
@@ -940,6 +940,18 @@ html.land .term{grid-template-rows:minmax(0,1fr) auto!important}
 .rv-tap{font:400 .58rem var(--mono);color:#888;margin-top:4px;animation:ldot 1.2s steps(1) infinite}
 @media (prefers-reduced-motion:reduce){.rv-rays,.rv-conf i,.rv-item,.rv-box{animation:none}}
 .order.rich{outline:2px dashed #d97706;outline-offset:-3px}.order.rich .rq em{color:#b45309}
+.story .st-ch{display:inline-block;font:700 .62rem var(--mono);letter-spacing:.25em;color:#fff;background:#1f44c8;padding:2px 8px}
+.story h2{margin:.3em 0}.st-art{text-align:center;margin:6px auto}
+.st-dlg p{margin:.45em 0;opacity:0;animation:stIn .35s steps(3) forwards}.st-dlg b{color:#e2245a}
+@keyframes stIn{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:none}}
+.pthlist{display:flex;flex-direction:column;gap:5px}
+.pth{display:flex;gap:10px;align-items:center;text-align:left;padding:6px 10px;background:#fff;border:2px solid;border-color:#808080 #fff #fff #808080;font:inherit;color:inherit;cursor:default}
+.pth b{font:700 1rem var(--mono);color:#1f44c8;min-width:2ch}.pth span{display:flex;flex-direction:column;flex:1;gap:2px}.pth em{font-style:normal;font-weight:700}.pth i{font-style:normal;font-size:.7rem;opacity:.75}
+.pth.done{cursor:pointer;background:#eef3ff}.pth.done b{color:#0e9f6e}.pth.cur{border-color:#e2245a;border-style:dashed}.pth.lock{opacity:.5}
+.pth u{display:block;height:6px;background:#e5e1d5;border:1px solid #808080}.pth u s{display:block;height:100%;background:#e2245a}
+#avatar.posing{color:#e2245a}
+@media (prefers-reduced-motion:reduce){.st-dlg p{animation:none;opacity:1}}
+@media (max-height:560px){.icons{grid-template-columns:repeat(3,92px)!important;gap:2px 6px!important;padding-top:8px!important}.icons .dicon pre{margin-bottom:1px}}
 </style>
 <script>/* мост к Android: вибрация через нативный API */
 if(window.AndroidApp){navigator.vibrate=function(p){try{AndroidApp.vibrate(JSON.stringify(Array.isArray(p)?p:[p]))}catch(e){}return true}}</script>
@@ -3206,6 +3218,53 @@ setInterval(()=>{try{if(!streamOn||!$('pc').hidden||document.hidden)return;const
   const msg='поле съехало: off '+Math.round(off)+' · '+(info.join(' | ')||'нет прокрутки')+' · g '+Math.round(g.height)+'/'+Math.round(a.height);try{an('layout_fix',msg)}catch(e){}
   try{let d=document.getElementById('k2err');if(!d){d=document.createElement('div');d.id='k2err';d.style.cssText='position:fixed;left:6px;top:6px;z-index:99999;max-width:70vw;background:#fff;color:#c00;border:2px solid #c00;font:11px monospace;padding:4px 6px;pointer-events:none';document.body.appendChild(d)}const l=document.createElement('div');l.textContent='⚠ '+msg;d.appendChild(l);while(d.children.length>3)d.firstChild.remove();clearTimeout(d._t);d._t=setTimeout(()=>d.remove(),15000)}catch(e){}
 }catch(e){}},1000);
+
+/* ---------- путь канала: главы истории по уровням канала ---------- */
+var STORY=[
+ {n:'Первая сотня',art:"  .------.\n  |[ON  ]|  .-.\n  |______| (o.o)\n  /______\\  > <",d:[['Я','Сто подписчиков! Мам, у меня СТО подписчиков!'],['Кот','Мяу. Теперь корми меня как звезду.'],['Я','Это почти целый класс. Только все смотрят меня!']]},
+ {n:'Свой логотип',art:" ___________\n| K R I S T |\n|  A L L  * |\n|___2000____|",d:[['Я','Чат нарисовал мне логотип в Paint. Он кривой. Он идеальный.'],['Кот','Добавь кота. Логотипам нужен кот.'],['Я','...добавила.']]},
+ {n:'Первый фан-арт',art:"   /\\_/\\\n  ( ^.^ )  <3\n  /|   |\\\n  ASCII by Glitter_Girl",d:[['Я','Мне прислали ASCII-рисунок! Это я? Это я!'],['Кот','Нос похож. Хвоста нет. Тройка.'],['Я','Повешу на стену. В рамочку.']]},
+ {n:'Тысяча!',art:" .-----------------.\n | ХАКЕР · форум    |\n | > стрим недели:  |\n | > КРИСТАЛЛ-2000  |\n '-----------------'",d:[['Я','Про нас написали на форуме! «Стрим недели»!'],['Кот','Я читал комментарии. Про меня больше.'],['Я','Тысяча человек. Это уже маленький город.']]},
+ {n:'Выделенка',art:"  [56K]  -->  [LAN]\n  ~~~~~        ====\n  пиу-пиу-шшш  тишина",d:[['Я','Прощай, модем! Нам провели выделенку. Стрим больше не рвётся!'],['Кот','Я буду скучать по звуку дозвона.'],['Я','Пиу-пиу-шшшш... Я тоже.']]},
+ {n:'Фан-встреча',art:"  ___  ___  ___\n (o.o)(^.^)(*.*)\n  /|\\  /|\\  /|\\\n  кафе у метро",d:[['Я','Сорок человек пришли в кафе у метро. Ради меня. Ради НАС.'],['Кот','Мне принесли сосиску. Лучший день.'],['Я','Все спрашивали про кота, кстати.']]},
+ {n:'Переезд',art:"  _____  _____\n |BOX 1||BOX 2|\n |_____||_____|\n  своя комната!",d:[['Я','Своя комната для стримов! С поролоном на стенах!'],['Кот','Коробки. Сто коробок. Я в раю.'],['Я','Только не грызи провода, пожалуйста.']]},
+ {n:'Нас показали по ТВ',art:"  .--------.\n  | ((TV)) |\n  | о_о  * |\n  '--------'\n  «Интернет за неделю»",d:[['Я','Нас показали по телевизору! Бабушка звонила!'],['Кот','Меня показали две секунды. Я звезда.'],['Я','Бабушка спросила, что такое стрим. Я не смогла объяснить.']]},
+ {n:'Фестиваль стримеров',art:"  *  .-------.  *\n *   | ДК 2000|   *\n     | FESTIVAL|\n  ~~~'---------'~~~",d:[['Я','Нас пригласили на фестиваль стримеров! Сцена! Свет!'],['Кот','Я поеду в переноске VIP-класса.'],['Я','Там будет NekoChan. И PixelMiku. И... мы.']]},
+ {n:'Легенда нулевых',art:"    .-~~~~~~-.\n   / *  ** *  \\\n  |  СПАСИБО,  |\n  |    ЧАТ!    |\n   \\__________/",d:[['Я','Сто тысяч. Я помню, как нас было сто.'],['Кот','Я помню, как меня не кормили.'],['Я','Спасибо, чат. Это всё — вы. Эфир продолжается!']]}];
+function storyHtml(i){const c=STORY[i];return`<div class="story"><div class="st-ch">ГЛАВА ${i+1}</div><h2>${c.n}</h2><pre class="ascii st-art">${c.art.replace(/</g,'&lt;')}</pre>
+  <div class="st-dlg">${c.d.map(([w,t],k)=>`<p style="animation-delay:${.4+k*1.1}s"><b>${w==='Кот'?'=^.^= Кот':'Стримерша'}:</b> ${t}</p>`).join('')}</div>
+  <p class="dim st-next">${i+1<STORY.length?`Следующая глава: ${SUB_GOALS[i+1]?SUB_GOALS[i+1].toLocaleString('ru-RU'):'?'} подписчиков`:'Путь пройден. Но эфир продолжается!'}</p></div>`}
+function showStory(i,replay){if(!STORY[i])return;S.storySeen=S.storySeen||[];if(!S.storySeen.includes(i))S.storySeen.push(i);save();
+  openSheet(storyHtml(i)+`<div class="btns">${replay?'<button class="btn" id="stBack">◀ Путь канала</button>':''}<button class="btn pink" id="stOk">${replay?'Закрыть':'Дальше ▶'}</button></div>`,'story.exe');
+  $('stOk').onclick=closeSheet;if(replay)$('stBack').onclick=showPath;try{sfx.fanfare()}catch(e){}try{an('story',i+1)}catch(e){}}
+function showPath(){const lv=chanLvl(),subs=S.subs||0;
+  const rows=STORY.map((c,i)=>{const done=lv>i,cur=lv===i,need=SUB_GOALS[i];const pct=cur?Math.min(100,Math.round(subs/need*100)):0;
+    return`<button class="pth${done?' done':cur?' cur':' lock'}" ${done?`data-st="${i}"`:''}><b>${String(i+1).padStart(2,'0')}</b><span><em>${done||cur?c.n:'???'}</em><i>${need.toLocaleString('ru-RU')} подписчиков${done?' · ✓ смотреть':cur?` · ${pct}%`:''}</i>${cur?`<u><s style="width:${pct}%"></s></u>`:''}</span></button>`}).join('');
+  openSheet(`<h2>Путь канала</h2><p>Подписчики: <b>${subs.toLocaleString('ru-RU')}</b>. На каждом уровне канала — новая глава истории стримерши и кота.</p><div class="pthlist">${rows}</div>`,'channel.exe');
+  sheet.querySelectorAll('[data-st]').forEach(b=>b.onclick=()=>showStory(+b.dataset.st,true))}
+(function(){const o=window.addSubs;if(typeof o!=='function')return;window.addSubs=function(n){const b=S.subGoalIx||0;const r=o.apply(this,arguments);const a=S.subGoalIx||0;
+  if(a>b){S.storyPend=S.storyPend||[];for(let k=b;k<a;k++)if(STORY[k]&&!(S.storySeen||[]).includes(k)&&!S.storyPend.includes(k))S.storyPend.push(k);save()}return r}})();
+setInterval(()=>{if(!S.storyPend||!S.storyPend.length||!streamOn||S.tut<5)return;if(tourOn||!overlay.hidden||revealOn||E||rlActive||tipBlocked()||queue.length)return;
+  if(window.__stT&&Date.now()-window.__stT<4000)return;showStory(S.storyPend.shift());window.__stT=Date.now()},2000);
+DESK_ICONS.splice(DESK_ICONS.findIndex(d=>d.id==='room'),0,{id:'path',label:'Путь канала',art:"  _/\\_\n |1->9|\n '-★-'"});
+DESK_APPS.push('path');
+(function(){const o=window.deskAction;window.deskAction=function(a){if(a==='path'){if(onDesk()){sfx.key('0');showPath();return}launchStream();setTimeout(showPath,streamOn?380:1400);return}return o.apply(this,arguments)}})();
+(function(){const o=window.deskTopHtml;window.deskTopHtml=function(){const h=o.apply(this,arguments);const d=DESK_ICONS.find(x=>x.id==='path');const btn=`<button class="dicon" data-a="path"><pre>${d.art.replace(/</g,'&lt;')}</pre><span>Путь канала${(S.storyPend||[]).length?'<i>•</i>':''}</span></button>`;return h.replace('<button class="dicon" data-a="room">',btn+'<button class="dicon" data-a="room">')}})();
+(function(){const o=window.toggleSMenu;window.toggleSMenu=function(){const r=o.apply(this,arguments);try{const m=$('smenu');const sh=m&&m.querySelector('[data-sa="shop"]');if(sh&&!m.querySelector('[data-sa="path"]')){const li=document.createElement('li');li.innerHTML='<button data-sa="path">★ Путь канала</button>';sh.parentElement.after(li)}}catch(e){}return r}})();
+
+/* ---------- сценки стримерши с редкими предметами ---------- */
+var POSES={8:['cool','  \\_[# o:]_/','Тетрис до утра! Кто побьёт мой рекорд?'],9:['love',' ~d [|>] b~','128 песен в кармане. Это будущее!'],10:['wow','  _[~~~~]_','Он прозрачный! Видно все проводочки!'],11:['party',' <( 2000 )>','Ядро нулевых! Чат, это легенда!'],
+ 12:['uwu','    (:-)','Цепляю на рюкзак. Всем улыбаться!'],13:['cool','  #[xxxx]#','Теперь я эмо-стримерша. Ну, почти.'],14:['wow','   ( DVD )','Вечером киномарафон в чате!'],15:['wink','   [==]=-','Целых 128 мегабайт! Влезет всё!'],
+ 16:['cool',' [=]<-->[=]','Щёлк-щёлк! Звук слайдера — топ.'],17:['party',' [(o)] *!*','Улыбочку, чат! Фото на аватарку!'],18:['love','  [ (O) ]','Кручу колесо... кручу колесо...'],19:['nya',' <[+] o o>','Покемоны сами себя не поймают!'],
+ 20:['wow','  /[____]\\','Теперь стримить можно хоть из кафе!'],21:['wink','  ( (o) )','Теперь вы видите меня в 640×480!'],22:['party',' )))[#](((','Интернет без проводов?! Магия!'],23:['love','<( Web 2.0 )>','Это конец эпохи... и начало новой.']};
+var poseUntil=0;
+function itemPose(t){const p=POSES[t];if(!p||rlActive)return;const lines=avatarArt(p[0],false).split('\n');lines.splice(lines.length-2,2,'      /|  ||  |\\',p[1]);
+  poseUntil=Date.now()+5500;const av=$('avatar');av.textContent=lines.join('\n');av.classList.add('posing');
+  try{if(S.buddy)typeLine(p[2],'party');else toast(p[2])}catch(e){}chatSpawn(pick(['хочу такой же!!','ВАУ','у меня был такой','ностальгия...','<3']),true);
+  setTimeout(()=>{if(Date.now()>=poseUntil){av.classList.remove('posing');av.textContent=avatarArt(curFace||'idle',false)}},5600)}
+(function(){const o=window.setFace;window.setFace=function(f,talk,catOnly){if(Date.now()<poseUntil&&!catOnly)return o.call(this,f,talk,true);return o.apply(this,arguments)}})();
+(function(){const o=window.revEnd;window.revEnd=function(){const t=revealOn&&revealOn.tier;const r=o.apply(this,arguments);if(t!=null)setTimeout(()=>itemPose(t),300);return r}})();
+(function(){const o=window.bigReveal;window.bigReveal=function(t){const r=o.apply(this,arguments);if(revealOn)revealOn.tier=t;return r}})();
 </script>
 
 </body></html>
