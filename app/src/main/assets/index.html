@@ -2045,8 +2045,8 @@ function rwHud(){if(!RW)return;const left=Math.max(0,RW.end-Date.now()),boss=!!R
   $('rwCombo').textContent=RW.combo>1&&Date.now()-RW.lastM<(rlHas('combo')?3000:2000)?`КОМБО ×${RW.combo}`:''}
 function rwTick(){if(!RW||RW.done)return;if(tourOn){RW.end+=100;RW.spawnAt+=100;RW.hateT+=100;RW.bossT+=100;return}const now=Date.now();
   if(now>=RW.spawnAt){RW.nSpawn++;const t=rlHas('nostalgia')&&RW.nSpawn%4===0?1:0;if(!rwPlace(t)){rwFail('Поле переполнилось!');return}RW.spawnAt=now+RW.spInt*1000}
-  if(rlCurse('haters')&&!rlHas('antivir')&&now>RW.hateT){RW.hateT=now+9000;const e=RW.cells.map((x,i)=>x===null?i:-1).filter(i=>i>=0);if(e.length){const i=pick(e);RW.cells[i]=BAD;rwRender(i)}}
-  if(RW.boss&&now>RW.bossT){RW.bossT=now+6500;if(!rlHas('antivir')||Math.random()<.4){const e=nbrs(RW.boss.i,RW.cols,RW.cells.length).filter(i=>RW.cells[i]===null);const all=RW.cells.map((x,i)=>x===null?i:-1).filter(i=>i>=0);const pool=e.length?e:all;if(pool.length){const i=pick(pool);RW.cells[i]=BAD;rwRender(i);sfx.deny()}}}
+  if(rlCurse('haters')&&!rlHas('antivir')&&now>RW.hateT){RW.hateT=now+9000;const bn=RW.boss?nbrs(RW.boss.i,RW.cols,RW.cells.length):[],e=RW.cells.map((x,i)=>x===null&&!bn.includes(i)?i:-1).filter(i=>i>=0);if(e.length){const i=pick(e);RW.cells[i]=BAD;rwRender(i)}}
+  if(RW.boss&&now>RW.bossT){RW.bossT=now+6500;if(!rlHas('antivir')||Math.random()<.4){const nb=nbrs(RW.boss.i,RW.cols,RW.cells.length),fr=nb.filter(i=>RW.cells[i]!==BAD).length,e=fr>2?nb.filter(i=>RW.cells[i]===null):[];const all=RW.cells.map((x,i)=>x===null&&!(fr<=2&&nb.includes(i))?i:-1).filter(i=>i>=0);const pool=e.length?e:all;if(pool.length){const i=pick(pool);RW.cells[i]=BAD;rwRender(i);sfx.deny()}}}
   if(now>=RW.end){rwFail('Время вышло');return}rwHud()}
 function rwCheck(){if(!RW||RW.done)return;if(RW.boss?RW.boss.hp<=0:RW.score>=RW.target)rwWin()}
 function rwWin(){const t=RW.t,r=S.run;RW.done=true;rlStopWave();const fl=r.col+1;let c=8+fl*3+(t==='elite'?16:0);if(rlHas('greed'))c=Math.round(c*1.6);r.coins+=c;
